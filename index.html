@@ -193,6 +193,25 @@
     to   { transform: scale(1); }
   }
 
+  /* Hero logo — top-left, below the fixed header, 50% smaller & transparent */
+  .hero__logo {
+    position: absolute;
+    top: calc(var(--header-h) + clamp(1.5rem, 3vw, 2.5rem));
+    left: var(--gutter);
+    z-index: 4;
+    width: clamp(70px, 9vw, 110px);   /* 50% of previous size */
+    height: auto;
+    pointer-events: none;
+    opacity: 0.4;                     /* transparent effect */
+  }
+
+  .hero__logo img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
   /* Hero dots */
   .hero__dots {
     position: absolute;
@@ -795,6 +814,12 @@
     <div class="hero">
       <div class="hero__slides" id="heroSlides" style="view-transition-name: hero-media;" aria-hidden="true"></div>
       <div class="hero__dots" id="heroDots" role="tablist" aria-label="Hero image selector"></div>
+
+      <!-- Company logo, top-left, below the fixed header — 50% smaller & transparent -->
+      <div class="hero__logo">
+        <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/MGdeco-logo-light.svg" alt="MG Design Engineering logo" />
+      </div>
+
       <div class="wrap hero__inner">
         <p class="eyebrow">Architecture · Interior Design · Urban Solution Strategy</p>
         <h1 class="display">
