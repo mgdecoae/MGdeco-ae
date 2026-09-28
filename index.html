@@ -130,6 +130,8 @@
     }
   }
 
+  /* Offset main so fixed header doesn't cover view pages.
+     Hero still bleeds its slides up under the fixed header. */
   main {
     padding-top: var(--header-h);
   }
@@ -152,6 +154,7 @@
     }
   }
 
+  /* Slide container — parallax translates this, Ken Burns animates child imgs */
   .hero__slides {
     position: absolute;
     inset: 0;
@@ -180,6 +183,7 @@
 
   .hero__slide.is-active { opacity: 1; }
 
+  /* Per-slide Ken Burns — restarts each time a slide becomes active */
   .hero__slide.is-active img,
   .hero__slide.is-active video {
     animation: heroZoom 9s var(--ease-out) forwards;
@@ -189,6 +193,7 @@
     to   { transform: scale(1); }
   }
 
+  /* Hero dots */
   .hero__dots {
     position: absolute;
     left: var(--gutter);
@@ -231,6 +236,7 @@
     z-index: 2;
   }
 
+  /* Give hero text breathing room from the fixed nav on desktop */
   @media (min-width: 761px) {
     .hero__inner {
       padding-top: calc(var(--header-h) + clamp(3rem, 6vw, 5rem));
@@ -266,6 +272,7 @@
   @keyframes fadeUp { to { opacity: 1; transform: none; } }
 
   /* ---------- Editorial intro / Studio ---------- */
+  /* Two-column, two-row grid so "Our services" aligns with "Interior Design" */
   .intro {
     display: grid;
     grid-template-columns: 1fr 2fr;
@@ -284,6 +291,7 @@
     }
   }
 
+  /* Row 1 */
   .intro__eyebrow-studio {
     grid-column: 1;
     grid-row: 1;
@@ -295,6 +303,8 @@
     align-self: start;
   }
 
+  /* Row 2 — eyebrow and first service item share a baseline.
+     Optical padding mirrors the li a top-padding so they align. */
   .intro__eyebrow-services {
     grid-column: 1;
     grid-row: 2;
@@ -322,7 +332,9 @@
   }
   .intro.is-visible h2 .word { opacity: 1; transform: none; }
 
-  /* ---------- Services index list (home view) ---------- */
+  /* ---------- Services index list ----------
+     Typography matches the intro paragraph: Georgia serif,
+     same clamp size, same line-height, same tracking, full ink. */
   .services {
     list-style: none;
     display: flex;
@@ -695,225 +707,6 @@
   }
   .back-btn:hover { gap: 0.9rem; color: var(--accent); border-color: var(--accent); }
 
-  /* =====================================================
-     SERVICES VIEW — redesigned layout
-     ===================================================== */
-  .services-view {
-    padding-block: clamp(2rem, 5vw, 4rem) clamp(3rem, 7vw, 5rem);
-  }
-
-  .services-view__intro {
-    max-width: 62ch;
-    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
-    color: var(--muted);
-    margin-bottom: clamp(2.5rem, 5vw, 4rem);
-  }
-
-  .services-view__intro p + p { margin-top: 1rem; }
-
-  /* Service cards grid */
-  .service-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: clamp(1rem, 2vw, 1.5rem);
-    margin-bottom: clamp(3.5rem, 7vw, 6rem);
-  }
-
-  @media (max-width: 900px) {
-    .service-grid { grid-template-columns: 1fr; }
-  }
-
-  .service-card {
-    position: relative;
-    border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.35);
-    padding: clamp(1.5rem, 3vw, 2.25rem);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    transition: transform 0.5s var(--ease-out),
-                border-color 0.5s var(--ease-out),
-                box-shadow 0.5s var(--ease-out),
-                background 0.5s var(--ease-out);
-    overflow: hidden;
-  }
-
-  .service-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 2px;
-    width: 0;
-    background: var(--accent);
-    transition: width 0.6s var(--ease-out);
-  }
-
-  .service-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--ink);
-    box-shadow: 0 22px 40px -28px rgba(20, 17, 15, 0.35);
-    background: rgba(255, 255, 255, 0.6);
-  }
-
-  .service-card:hover::before { width: 100%; }
-
-  .service-card__index {
-    font-family: "Helvetica Neue", Arial, sans-serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .service-card__title {
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: 400;
-    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-  }
-
-  .service-card__promise {
-    font-size: 0.98rem;
-    color: var(--muted);
-    max-width: 44ch;
-  }
-
-  .service-card__list {
-    list-style: none;
-    margin-top: 0.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--line);
-    display: grid;
-    gap: 0.45rem;
-  }
-
-  .service-card__list li {
-    display: flex;
-    align-items: baseline;
-    gap: 0.6rem;
-    font-size: 0.88rem;
-    color: var(--ink);
-  }
-
-  .service-card__list li::before {
-    content: "—";
-    color: var(--accent);
-    font-family: Georgia, serif;
-    flex-shrink: 0;
-  }
-
-  /* How we work strip */
-  .how-we-work {
-    border-top: 1px solid var(--line);
-    padding-top: clamp(2.5rem, 5vw, 4rem);
-    margin-bottom: clamp(3.5rem, 7vw, 6rem);
-  }
-
-  .how-we-work__head {
-    margin-bottom: clamp(1.75rem, 3vw, 2.75rem);
-    max-width: 60ch;
-  }
-
-  .how-we-work__head h2 {
-    font-family: Georgia, serif;
-    font-weight: 400;
-    font-size: clamp(1.5rem, 3vw, 2.25rem);
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    margin-top: 0.85rem;
-  }
-
-  .how-we-work__grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(1.25rem, 3vw, 2.5rem);
-  }
-
-  @media (max-width: 760px) {
-    .how-we-work__grid { grid-template-columns: 1fr; }
-  }
-
-  .how-we-work__step {
-    position: relative;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .how-we-work__step::before {
-    content: "";
-    position: absolute;
-    top: -1px;
-    left: 0;
-    width: 32px;
-    height: 2px;
-    background: var(--accent);
-  }
-
-  .how-we-work__num {
-    font-family: "Helvetica Neue", Arial, sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    font-weight: 600;
-    display: block;
-    margin-bottom: 0.75rem;
-  }
-
-  .how-we-work__step h3 {
-    font-family: Georgia, serif;
-    font-weight: 400;
-    font-size: clamp(1.15rem, 1.8vw, 1.5rem);
-    line-height: 1.2;
-    margin-bottom: 0.6rem;
-    color: var(--ink);
-  }
-
-  .how-we-work__step p {
-    font-size: 0.92rem;
-    color: var(--muted);
-    max-width: 40ch;
-  }
-
-  /* Services CTA band */
-  .services-cta {
-    border: 1px solid var(--ink);
-    padding: clamp(2rem, 4vw, 3rem);
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 2rem;
-    flex-wrap: wrap;
-    background: rgba(180, 83, 9, 0.04);
-  }
-
-  .services-cta__text {
-    max-width: 48ch;
-  }
-
-  .services-cta__text h2 {
-    font-family: Georgia, serif;
-    font-weight: 400;
-    font-size: clamp(1.4rem, 2.6vw, 2rem);
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    margin-bottom: 0.75rem;
-  }
-
-  .services-cta__text p {
-    color: var(--muted);
-    font-size: 0.98rem;
-  }
-
-  .services-cta__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    align-items: center;
-  }
-
   /* ---------- View Transitions ---------- */
   ::view-transition-old(root),
   ::view-transition-new(root) {
@@ -946,7 +739,7 @@
     to   { opacity: 1; transform: scale(1); }
   }
 
-  /* Reduced motion */
+  /* Reduced motion: no view transitions, no cursor effects, no hero rotation */
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after {
@@ -968,7 +761,6 @@
     .intro h2 .word { opacity: 1; transform: none; }
     .card { transform: none !important; }
     .projects::before, .card::after { display: none; }
-    .service-card { transform: none !important; }
     ::view-transition-old(root),
     ::view-transition-new(root) { animation: none; }
   }
@@ -1035,31 +827,31 @@
       <div class="intro__services">
         <ul class="services" aria-label="Our services">
           <li>
-            <a href="#" data-route="Services">
+            <a href="#" data-route="work">
               <span>Interior Design</span>
               <span class="arrow" aria-hidden="true">→</span>
             </a>
           </li>
           <li>
-            <a href="#" data-route="Services">
+            <a href="#" data-route="work">
               <span>Architecture Design</span>
               <span class="arrow" aria-hidden="true">→</span>
             </a>
           </li>
           <li>
-            <a href="#" data-route="Services">
+            <a href="#" data-route="work">
               <span>Urban Design</span>
               <span class="arrow" aria-hidden="true">→</span>
             </a>
           </li>
           <li>
-            <a href="#" data-route="Services">
+            <a href="#" data-route="work">
               <span>Urban Solution Strategy</span>
               <span class="arrow" aria-hidden="true">→</span>
             </a>
           </li>
           <li>
-            <a href="#" data-route="Services">
+            <a href="#" data-route="work">
               <span>Project Management</span>
               <span class="arrow" aria-hidden="true">→</span>
             </a>
@@ -1172,7 +964,7 @@
 
   </section>
 
-  <!-- ============ SERVICES VIEW (redesigned) ============ -->
+  <!-- ============ SERVICES VIEW ============ -->
   <section class="view" data-view="Services" aria-label="Services">
     <div class="wrap view-header">
       <div>
@@ -1182,154 +974,63 @@
       <button class="back-btn" data-route="home"><span class="arrow">←</span> Back</button>
     </div>
 
-    <div class="wrap services-view">
-
-      <div class="services-view__intro reveal">
-        <p>
-          We work across the full lifecycle of a project — from the first strategic
-          question about a site, through design and documentation, to delivery on
-          the ground. Each service can be commissioned on its own, or combined into
-          an integrated brief.
-        </p>
-        <p>
-          Not sure where to start? Most clients begin with a conversation about the
-          site, the brief, and the commercial outcome they're aiming for.
-        </p>
+    <!-- Use the same two-column, two-row grid as the editorial intro -->
+    <div class="wrap intro reveal">
+      <!-- Row 1 -->
+      <p class="eyebrow intro__eyebrow-studio">The practice</p>
+      <div class="intro__lede">
+        <h2 data-words>
+          From the first sketch to final handover, we offer a full spectrum of professional services across
+          architecture, interiors, urban design, strategy, and delivery — each one shaped to help you make
+          better decisions and build places that perform.
+        </h2>
       </div>
 
-      <!-- 5 service cards -->
-      <div class="service-grid">
-
-        <article class="service-card reveal">
-          <span class="service-card__index">01</span>
-          <h2 class="service-card__title">Interior Design</h2>
-          <p class="service-card__promise">
-            Spaces that perform as well as they look — tuned to how people
-            actually use them.
-          </p>
-          <ul class="service-card__list">
-            <li>Concept & spatial planning</li>
-            <li>Material, finish & FF&amp;E selection</li>
-            <li>Lighting and acoustic strategy</li>
-            <li>Documentation & site review</li>
-          </ul>
-        </article>
-
-        <article class="service-card reveal">
-          <span class="service-card__index">02</span>
-          <h2 class="service-card__title">Architecture Design</h2>
-          <p class="service-card__promise">
-            Buildings shaped by brief, budget, and place — resolved from
-            massing through to detail.
-          </p>
-          <ul class="service-card__list">
-            <li>Feasibility & massing studies</li>
-            <li>Concept and scheme design</li>
-            <li>Technical design & detailing</li>
-            <li>Authority approvals support</li>
-          </ul>
-        </article>
-
-        <article class="service-card reveal">
-          <span class="service-card__index">03</span>
-          <h2 class="service-card__title">Urban Design</h2>
-          <p class="service-card__promise">
-            Places that connect people, movement, and context at the scale
-            of the street and the district.
-          </p>
-          <ul class="service-card__list">
-            <li>Site & context analysis</li>
-            <li>Public realm & landscape strategy</li>
-            <li>Mobility and access planning</li>
-            <li>Design guidelines & frameworks</li>
-          </ul>
-        </article>
-
-        <article class="service-card reveal">
-          <span class="service-card__index">04</span>
-          <h2 class="service-card__title">Urban Solution Strategy</h2>
-          <p class="service-card__promise">
-            Evidence-led decisions before you commit — so the brief is right
-            before the design begins.
-          </p>
-          <ul class="service-card__list">
-            <li>Highest &amp; Best Use (HBU) studies</li>
-            <li>Market and user insight</li>
-            <li>Commercial and viability testing</li>
-            <li>Delivery and phasing roadmaps</li>
-          </ul>
-        </article>
-
-        <article class="service-card reveal">
-          <span class="service-card__index">05</span>
-          <h2 class="service-card__title">Project Management</h2>
-          <p class="service-card__promise">
-            Delivered on time, on budget, on brief — with a single point of
-            accountability.
-          </p>
-          <ul class="service-card__list">
-            <li>Programme & cost control</li>
-            <li>Consultant coordination</li>
-            <li>Procurement and tender support</li>
-            <li>Handover & close-out</li>
-          </ul>
-        </article>
-
+      <!-- Row 2 — "Our services" aligns with the first item; now with arrows & links -->
+      <p class="eyebrow intro__eyebrow-services">Our services</p>
+      <div class="intro__services">
+        <ul class="services" aria-label="Our services">
+          <li>
+            <a href="#" data-route="work">
+              <span>Interior Design</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-route="work">
+              <span>Architecture Design</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-route="work">
+              <span>Urban Design</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-route="work">
+              <span>Urban Solution Strategy</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-route="work">
+              <span>Project Management</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        </ul>
       </div>
+    </div>
 
-      <!-- How we work -->
-      <div class="how-we-work reveal">
-        <div class="how-we-work__head">
-          <p class="eyebrow">How we work</p>
-          <h2>Three steps, from first question to handover.</h2>
-        </div>
-
-        <div class="how-we-work__grid">
-          <div class="how-we-work__step">
-            <span class="how-we-work__num">Step 01</span>
-            <h3>Listen</h3>
-            <p>
-              We start with the site, the brief, the constraints, and the
-              commercial outcome you're aiming for — before any design work.
-            </p>
-          </div>
-          <div class="how-we-work__step">
-            <span class="how-we-work__num">Step 02</span>
-            <h3>Test</h3>
-            <p>
-              Options are modelled, tested against data, and pressure-checked
-              commercially — so decisions are made on evidence, not assumption.
-            </p>
-          </div>
-          <div class="how-we-work__step">
-            <span class="how-we-work__num">Step 03</span>
-            <h3>Deliver</h3>
-            <p>
-              Documentation, coordination, and site review — carried through
-              to handover with a single team accountable end to end.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA -->
-      <div class="services-cta reveal">
-        <div class="services-cta__text">
-          <h2>Not sure which service fits your brief?</h2>
-          <p>
-            Tell us about your site or project and we'll suggest the right
-            starting point — no obligation.
-          </p>
-        </div>
-        <div class="services-cta__actions">
-          <a href="mailto:enquiry@mgdeco.ae" class="btn">Start a conversation <span class="arrow">→</span></a>
-          <button class="back-btn" data-route="home"><span class="arrow">←</span> Back to home</button>
-        </div>
-      </div>
-
+    <!-- CTA -->
+    <div class="wrap view-body" style="padding-top: 0; padding-bottom: clamp(3rem, 6vw, 5rem); max-width: 62ch;">
+      <p>Not sure which service fits your brief? Start with a conversation.</p>
+      <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
     </div>
   </section>
-
+  
   <!-- ============ WORK VIEW ============ -->
   <section class="view" data-view="work" aria-label="Work">
     <div class="wrap view-header">
@@ -1405,7 +1106,6 @@
       <div>
         <h4>Explore</h4>
         <ul>
-          <li><a href="#" data-route="Services">Services</a></li>
           <li><a href="#" data-route="work">Work</a></li>
           <li><a href="#" data-route="studio">Studio</a></li>
           <li><a href="#" data-route="insights">Insights</a></li>
@@ -1432,7 +1132,9 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const supportsVT = 'startViewTransition' in document;
 
-  /* 1. SPLIT INTRO HEADLINE INTO WORDS */
+  /* =========================================================
+     1. SPLIT INTRO HEADLINE INTO WORDS
+     ========================================================= */
   document.querySelectorAll('[data-words]').forEach((el) => {
     const words = el.textContent.trim().split(/\s+/);
     el.innerHTML = words
@@ -1440,7 +1142,9 @@
       .join(' ');
   });
 
-  /* 2. REVEAL ON SCROLL */
+  /* =========================================================
+     2. REVEAL ON SCROLL
+     ========================================================= */
   const io = new IntersectionObserver(
     (entries) => {
       entries.forEach((e) => {
@@ -1454,13 +1158,15 @@
   );
   document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
-  /* 3. HERO SLIDER */
+  /* =========================================================
+     3. HERO SLIDER — data-driven crossfade
+     ========================================================= */
   const heroSlides = [
     {
       src: "https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Conference room.webm",
       alt: "Conference room",
       type: "video/webm"
-    },
+    },    
     {
       src: "https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/SA1.jpeg",
       alt: "Modern glass office towers at dusk"
@@ -1473,11 +1179,11 @@
       src: "https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/joud coffee.webm",
       alt: "Cultural building with public plaza at golden hour",
       type: "video/webm"
-    },
+    },    
     {
       src: "https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/hq2.webp",
       alt: "Parks"
-    }
+    },
   ];
 
   const heroSlidesEl = document.getElementById('heroSlides');
@@ -1486,7 +1192,7 @@
   let heroIndex = 0;
   let heroTimer = null;
   let heroPaused = false;
-  const HERO_INTERVAL = 6500;
+  const HERO_INTERVAL = 6500; // ms
 
   function renderHero() {
     if (!heroSlidesEl) return;
@@ -1498,6 +1204,7 @@
 
       let mediaEl;
       if (slide.type === 'video/webm') {
+        // Video slide with WebM placeholder
         const video = document.createElement('video');
         video.src = slide.src;
         video.type = slide.type;
@@ -1509,6 +1216,7 @@
         video.setAttribute('aria-label', slide.alt);
         mediaEl = video;
       } else {
+        // Image slide
         const img = document.createElement('img');
         img.src = slide.src;
         img.alt = slide.alt;
@@ -1552,6 +1260,7 @@
       const isActive = idx === heroIndex;
       s.classList.toggle('is-active', isActive);
 
+      // Pause/resume video based on active state
       const video = s.querySelector('video');
       if (video) {
         if (isActive) {
@@ -1568,11 +1277,12 @@
       d.setAttribute('aria-selected', idx === heroIndex ? 'true' : 'false');
     });
 
+    // Restart Ken Burns on the newly active slide
     const active = slides[heroIndex];
     const activeMedia = active && (active.querySelector('img') || active.querySelector('video'));
     if (activeMedia && !reduceMotion) {
       activeMedia.style.animation = 'none';
-      void activeMedia.offsetWidth;
+      void activeMedia.offsetWidth; // force reflow
       activeMedia.style.animation = '';
     }
 
@@ -1612,7 +1322,9 @@
 
   startHero();
 
-  /* 4. SCROLL PROGRESS + HEADER STATE + PARALLAX */
+  /* =========================================================
+     4. SCROLL PROGRESS + HEADER STATE + PARALLAX
+     ========================================================= */
   const progress = document.getElementById('scrollProgress');
   const header = document.getElementById('siteHeader');
   const parallaxEls = Array.from(document.querySelectorAll('[data-parallax]'));
@@ -1661,7 +1373,9 @@
 
   updateParallax();
 
-  /* 5. CURSOR SPOTLIGHT ON PROJECT GRID */
+  /* =========================================================
+     5. CURSOR SPOTLIGHT ON PROJECT GRID
+     ========================================================= */
   const grid = document.getElementById('projectGrid');
   const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
@@ -1725,7 +1439,9 @@
     });
   }
 
-  /* 6. ROUTER + VIEW TRANSITIONS API */
+  /* =========================================================
+     6. ROUTER + VIEW TRANSITIONS API
+     ========================================================= */
   const views = Array.from(document.querySelectorAll('.view'));
   const navLinks = Array.from(document.querySelectorAll('.nav ul a[data-route]'));
   let currentView = 'home';
@@ -1793,7 +1509,9 @@
     setActiveNav('home');
   }
 
-  /* 7. MOBILE MENU */
+  /* =========================================================
+     7. MOBILE MENU (basic)
+     ========================================================= */
   const toggle = document.querySelector('.menu-toggle');
   const navUl = document.querySelector('.nav ul');
   if (toggle && navUl) {
