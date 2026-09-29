@@ -154,13 +154,27 @@
     }
   }
 
+  /* Fixed placeholder that sits behind the rotating slides */
+  .hero__placeholder {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: url("https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/hq2.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;   /* stays put while the page scrolls */
+    filter: brightness(0.55);
+    pointer-events: none;
+  }
+
   /* Slide container — parallax translates this, Ken Burns animates child imgs */
   .hero__slides {
     position: absolute;
     inset: 0;
     overflow: hidden;
     will-change: transform;
-    background: #2b2723;
+    background: transparent;   /* lets the placeholder show through */
   }
 
   .hero__slide {
@@ -965,6 +979,110 @@
   }
   .back-btn:hover { gap: 0.9rem; color: var(--accent); border-color: var(--accent); }
 
+  /* ---------- Interior Design view: header replaced by burger ---------- */
+  body.is-interior #siteHeader { display: none; }
+  body.is-interior main { padding-top: 0; }
+
+  body.is-interior .view[data-view="interior-design"] .view-header {
+    padding-top: clamp(4.5rem, 9vw, 6rem);
+  }
+
+  /* Floating burger button (only shown in the Interior Design view) */
+  .burger-fab {
+    position: fixed;
+    top: clamp(1rem, 2.5vw, 1.5rem);
+    right: var(--gutter);
+    z-index: 70;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 48px;
+    height: 48px;
+    padding: 0 13px;
+    background: rgba(244, 241, 236, 0.9);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+  body.is-interior .burger-fab { display: flex; }
+
+  .burger-fab:hover { border-color: var(--ink); }
+
+  .burger-fab span {
+    display: block;
+    width: 100%;
+    height: 1.5px;
+    background: var(--ink);
+    transition: transform 0.35s var(--ease), opacity 0.25s var(--ease);
+  }
+  .burger-fab.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .burger-fab.is-open span:nth-child(2) { opacity: 0; }
+  .burger-fab.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  .burger-fab:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* Fixed logo aligned with the burger (only visible in Interior Design view) */
+  .interior-logo {
+    position: fixed;
+    top: clamp(1rem, 2.5vw, 1.5rem);
+    left: var(--gutter);
+    z-index: 70;
+    display: none;
+    font-family: Georgia, serif;
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 48px;          /* match burger height for vertical centering */
+    height: 48px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100vw - 2 * var(--gutter) - 70px); /* prevent overlap with burger */
+  }
+  body.is-interior .interior-logo { display: block; }
+
+  /* Full-screen burger menu panel */
+  .burger-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s var(--ease-out), visibility 0.45s var(--ease-out);
+  }
+  .burger-menu.is-open { opacity: 1; visibility: visible; }
+
+  .burger-menu ul {
+    list-style: none;
+    display: grid;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+    text-align: center;
+  }
+
+  .burger-menu a {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(1.75rem, 5vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    transition: color 0.3s var(--ease);
+  }
+  .burger-menu a:hover,
+  .burger-menu a:focus-visible { color: var(--accent); outline: none; }
+
   /* ---------- View Transitions ---------- */
   ::view-transition-old(root),
   ::view-transition-new(root) {
@@ -1021,6 +1139,7 @@
     .projects::before, .card::after { display: none; }
     ::view-transition-old(root),
     ::view-transition-new(root) { animation: none; }
+    .burger-menu { transition: none; }
   }
 </style>
 </head>
@@ -1044,6 +1163,30 @@
   </div>
 </header>
 
+<!-- Burger chrome used only by the Interior Design view -->
+<button class="burger-fab" id="burgerFab" type="button"
+        aria-label="Open menu" aria-expanded="false" aria-controls="burgerMenu">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- Fixed logo aligned with the burger, shown only in Interior Design view -->
+<a href="#" class="interior-logo" data-route="home">MG Design Engineering Company</a>
+
+<div class="burger-menu" id="burgerMenu" aria-hidden="true">
+  <nav aria-label="Interior design menu">
+    <ul>
+      <li><a href="#" data-route="home">Home</a></li>
+      <li><a href="#" data-route="Services">Services</a></li>
+      <li><a href="#" data-route="work">Work</a></li>
+      <li><a href="#" data-route="studio">Studio</a></li>
+      <li><a href="#" data-route="insights">Insights</a></li>
+      <li><a href="#" data-route="contact">Contact</a></li>
+    </ul>
+  </nav>
+</div>
+
 <main id="main">
 
   <!-- ============ HOME VIEW ============ -->
@@ -1051,6 +1194,9 @@
 
     <!-- HERO -->
     <div class="hero">
+      <!-- Fixed placeholder behind the rotating slides -->
+      <div class="hero__placeholder" aria-hidden="true"></div>
+
       <div class="hero__slides" id="heroSlides" style="view-transition-name: hero-media;" aria-hidden="true"></div>
       <div class="hero__dots" id="heroDots" role="tablist" aria-label="Hero image selector"></div>
 
@@ -1296,13 +1442,14 @@
   </section>
 
   <!-- ============ INTERIOR DESIGN VIEW (Magazine layout + Scope of work) ============ -->
+  <!-- Header is replaced by the floating burger button on this view (body.is-interior) -->
   <section class="view" data-view="interior-design" aria-label="Interior Design">
     <div class="wrap view-header">
       <div>
         <p class="eyebrow">Interior Design</p>
         <h1>How we work</h1>
       </div>
-      <button class="back-btn" data-route="Services"><span class="arrow">←</span> Back to services</button>
+      <!-- Back button removed -->
     </div>
 
     <div class="wrap magazine">
@@ -1912,6 +2059,10 @@
     currentView = route;
     setActiveNav(route);
 
+    /* Swap the fixed header for the burger on the Interior Design view */
+    document.body.classList.toggle('is-interior', route === 'interior-design');
+    closeBurgerMenu();
+
     const heading = next.querySelector('h1, .display');
     if (heading) {
       heading.setAttribute('tabindex', '-1');
@@ -1979,6 +2130,39 @@
         background: 'var(--paper)',
         borderBottom: '1px solid var(--line)'
       });
+    });
+  }
+
+  /* =========================================================
+     8. BURGER MENU (Interior Design view)
+     ========================================================= */
+  const burgerBtn = document.getElementById('burgerFab');
+  const burgerMenu = document.getElementById('burgerMenu');
+
+  function closeBurgerMenu() {
+    if (!burgerBtn || !burgerMenu) return;
+    burgerBtn.classList.remove('is-open');
+    burgerMenu.classList.remove('is-open');
+    burgerBtn.setAttribute('aria-expanded', 'false');
+    burgerBtn.setAttribute('aria-label', 'Open menu');
+    burgerMenu.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (burgerBtn && burgerMenu) {
+    burgerBtn.addEventListener('click', () => {
+      const open = !burgerMenu.classList.contains('is-open');
+
+      burgerBtn.classList.toggle('is-open', open);
+      burgerMenu.classList.toggle('is-open', open);
+      burgerBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      burgerBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      burgerMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeBurgerMenu();
     });
   }
 })();
