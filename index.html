@@ -826,6 +826,26 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  /* Step image placeholder */
+  .magazine__steps .step-media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #e6e1d8;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .magazine__steps .step-media img {
+    transition: transform 1.4s var(--ease-out);
+    will-change: transform;
+  }
+
+  .magazine__steps li:hover .step-media img {
+    transform: scale(1.05);
+  }
+
   .magazine__steps .step-num {
     font-family: Georgia, serif;
     font-size: 1.1rem;
@@ -1604,7 +1624,7 @@
        One view, four stacked cards:
          1. Overview (article)
          2. What we deliver (viewport height)
-         3. Our process (viewport height)
+         3. Our process (viewport height, with step images)
          4. Samples of work
        Hero carries an index list that scrolls to each card.
        As each card is covered by the next, it fades out. -->
@@ -1770,7 +1790,7 @@
         </div>
       </div>
 
-      <!-- ---------- Card 3 — Our process (viewport height) ---------- -->
+      <!-- ---------- Card 3 — Our process (viewport height, step images) ---------- -->
       <div class="idv__content idv__content--viewport" data-stack="3" id="idv-process">
         <div class="wrap magazine">
 
@@ -1784,16 +1804,25 @@
 
           <ol class="magazine__steps reveal" style="border-top: none; padding-top: 0; margin-top: 0;">
             <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=80" alt="Listen — briefing session with the client team" loading="lazy" />
+              </figure>
               <span class="step-num">01</span>
               <span class="step-title">Listen</span>
               <span class="step-copy">Brief, site, constraints and the people who will use the space.</span>
             </li>
             <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=1200&q=80" alt="Test — material samples and options under review" loading="lazy" />
+              </figure>
               <span class="step-num">02</span>
               <span class="step-title">Test</span>
               <span class="step-copy">Options, materials, light and cost — tested against real use.</span>
             </li>
             <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80" alt="Deliver — finished interior ready for handover" loading="lazy" />
+              </figure>
               <span class="step-num">03</span>
               <span class="step-title">Deliver</span>
               <span class="step-copy">Documentation, coordination, and on-site review through to handover.</span>
