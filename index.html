@@ -709,24 +709,243 @@
 
   .view-body p + p { margin-top: 1.25rem; }
 
-  /* ---------- Sample projects grid (inside Interior Design view) ---------- */
-  .sample-projects {
+  /* ---------- Magazine layout (Interior Design view) ---------- */
+  .magazine {
+    padding-block: clamp(3rem, 7vw, 5rem) clamp(4rem, 9vw, 7rem);
+  }
+
+  /* Lead image — full-bleed within the wrap, generous height */
+  .magazine__lead {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    background: #e6e1d8;
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  @media (max-width: 760px) {
+    .magazine__lead { aspect-ratio: 4 / 3; }
+  }
+  .magazine__lead img {
+    transition: transform 1.6s var(--ease-out);
+    will-change: transform;
+  }
+  .magazine__lead:hover img { transform: scale(1.03); }
+
+  /* Intro block: drop cap + standfirst, magazine style */
+  .magazine__intro {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(1rem, 2vw, 1.5rem);
-    margin-top: 2.5rem;
+    grid-template-columns: 1fr;
+    max-width: 78ch;
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .magazine__standfirst {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .magazine__dropcap::first-letter {
+    font-family: Georgia, "Times New Roman", serif;
+    float: left;
+    font-size: 4.2em;
+    line-height: 0.85;
+    padding: 0.08em 0.12em 0 0;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .magazine__dropcap {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 62ch;
+  }
+
+  /* Pull quote — editorial accent */
+  .magazine__pullquote {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding-block: clamp(1.75rem, 4vw, 2.75rem);
+    margin-block: clamp(2.5rem, 6vw, 4rem);
+    display: flex;
+    gap: clamp(1rem, 3vw, 2rem);
+    align-items: baseline;
+  }
+  .magazine__pullquote::before {
+    content: "“";
+    font-family: Georgia, serif;
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    line-height: 0.7;
+    color: var(--accent);
+    flex: 0 0 auto;
+  }
+  .magazine__pullquote p {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(1.35rem, 2.6vw, 2rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    max-width: 40ch;
+  }
+
+  /* Two-column editorial body — magazine consistent */
+  .magazine__columns {
+    column-count: 2;
+    column-gap: clamp(2rem, 5vw, 4rem);
     max-width: none;
   }
+  .magazine__columns p {
+    font-size: 1.05rem;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    break-inside: avoid;
+  }
+  .magazine__columns p:last-child { margin-bottom: 0; }
 
-  .sample-projects .card {
+  @media (max-width: 760px) {
+    .magazine__columns { column-count: 1; }
+  }
+
+  /* Steps — Listen / Test / Deliver, magazine numbered list */
+  .magazine__steps {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    padding-top: clamp(2rem, 5vw, 3rem);
+    border-top: 1px solid var(--line);
+  }
+  @media (max-width: 760px) {
+    .magazine__steps { grid-template-columns: 1fr; }
+  }
+
+  .magazine__steps li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .magazine__steps .step-num {
+    font-family: Georgia, serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .magazine__steps .step-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .magazine__steps .step-copy {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Scope of work — magazine-style two-column service list */
+  .magazine__scope {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    padding-top: clamp(2rem, 5vw, 3rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .magazine__scope-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .magazine__scope-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: clamp(2rem, 5vw, 4rem);
+    row-gap: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  @media (max-width: 760px) {
+    .magazine__scope-list { grid-template-columns: 1fr; }
+  }
+
+  .magazine__scope-list li {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .magazine__scope-list .scope-num {
+    font-family: Georgia, serif;
+    font-size: 0.9rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    flex: 0 0 auto;
+    min-width: 2rem;
+  }
+
+  .magazine__scope-list .scope-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .magazine__scope-list .scope-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+    line-height: 1.25;
+    color: var(--ink);
+  }
+
+  .magazine__scope-list .scope-copy {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Sample projects grid — magazine-style, larger lead card */
+  .magazine__samples {
+    margin-top: clamp(3rem, 7vw, 5rem);
+    padding-top: clamp(2rem, 5vw, 3rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .magazine__samples-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .magazine__samples-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .magazine__samples-grid .card {
     aspect-ratio: 4 / 3;
   }
+  .magazine__samples-grid .card--lead { grid-column: span 8; aspect-ratio: 16 / 10; }
+  .magazine__samples-grid .card--side { grid-column: span 4; aspect-ratio: 4 / 5; }
+  .magazine__samples-grid .card--half { grid-column: span 6; aspect-ratio: 3 / 2; }
 
   @media (max-width: 900px) {
-    .sample-projects { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 600px) {
-    .sample-projects { grid-template-columns: 1fr; }
+    .magazine__samples-grid .card--lead,
+    .magazine__samples-grid .card--side,
+    .magazine__samples-grid .card--half { grid-column: span 12; }
   }
 
   .back-btn {
@@ -837,7 +1056,7 @@
 
       <!-- Company logo, top-left, below the fixed header — 50% smaller & transparent -->
       <div class="hero__logo">
-        <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/MGdeco-logo-light.svg" alt="MG Design Engineering logo" />
+        <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/MGdeco-logo-transparent-for-dark-bg.png" alt="MG Design Engineering logo" />
       </div>
 
       <div class="wrap hero__inner">
@@ -1076,7 +1295,7 @@
     </div>
   </section>
 
-  <!-- ============ INTERIOR DESIGN VIEW (How we work + sample projects) ============ -->
+  <!-- ============ INTERIOR DESIGN VIEW (Magazine layout + Scope of work) ============ -->
   <section class="view" data-view="interior-design" aria-label="Interior Design">
     <div class="wrap view-header">
       <div>
@@ -1085,48 +1304,182 @@
       </div>
       <button class="back-btn" data-route="Services"><span class="arrow">←</span> Back to services</button>
     </div>
-    <div class="wrap view-body" style="max-width: 62ch;">
-      <p>Interior design at MG Design Engineering is about making spaces that work as hard as they look. We balance spatial planning, materiality, lighting, and acoustics to create interiors that support the people who use them and reinforce the identity of the places they sit within.</p>
-      <p>Our process moves through three clear stages — <strong>Listen</strong>, <strong>Test</strong>, and <strong>Deliver</strong> — so every decision is grounded in how the space will actually be used, operated, and maintained.</p>
-    </div>
 
-    <!-- Sample projects — placeholder images -->
-    <div class="wrap" style="padding-bottom: clamp(3rem, 6vw, 5rem);">
-      <p class="eyebrow" style="margin-bottom: 1.25rem;">Sample projects</p>
-      <div class="sample-projects">
-        <article class="card reveal">
-          <div class="card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80" alt="Placeholder interior project one" loading="lazy" />
-          </div>
-          <div class="card__meta">
-            <h3>Sample Project 01</h3>
-            <span>Interiors · Placeholder</span>
-          </div>
-        </article>
-        <article class="card reveal">
-          <div class="card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80" alt="Placeholder interior project two" loading="lazy" />
-          </div>
-          <div class="card__meta">
-            <h3>Sample Project 02</h3>
-            <span>Interiors · Placeholder</span>
-          </div>
-        </article>
-        <article class="card reveal">
-          <div class="card__img-wrap">
-            <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80" alt="Placeholder interior project three" loading="lazy" />
-          </div>
-          <div class="card__meta">
-            <h3>Sample Project 03</h3>
-            <span>Interiors · Placeholder</span>
-          </div>
-        </article>
+    <div class="wrap magazine">
+
+      <!-- Lead image -->
+      <figure class="magazine__lead reveal">
+        <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=2000&q=80" alt="Interior design lead image — lounge with natural light" loading="lazy" />
+      </figure>
+
+      <!-- Standfirst + drop cap intro -->
+      <div class="magazine__intro reveal">
+        <p class="magazine__standfirst">
+          Interiors that work as hard as they look — spatial planning, materiality, light and acoustics
+          shaped around the people who will actually use the space.
+        </p>
+        <p class="magazine__dropcap">
+          Interior design at MG Design Engineering begins with a simple question: how will this space
+          really be used? From that answer we build a brief that balances atmosphere with operation —
+          so the finished interior supports daily life, reinforces the identity of the place, and holds
+          its value long after handover.
+        </p>
       </div>
-    </div>
 
-    <div class="wrap view-body" style="padding-top: 0; padding-bottom: clamp(3rem, 6vw, 5rem); max-width: 62ch;">
-      <p>To discuss an interior project, get in touch:</p>
-      <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
+      <!-- Pull quote -->
+      <aside class="magazine__pullquote reveal">
+        <p>Every decision is tested against how the space will be used, operated, and maintained.</p>
+      </aside>
+
+      <!-- Two-column editorial body -->
+      <div class="magazine__columns reveal">
+        <p>
+          We work across workplace, hospitality, residential, and cultural interiors — from early concept
+          sketches and spatial strategy through to FF&amp;E selection, technical documentation, and on-site
+          review. Each stage is designed to reduce risk and sharpen the brief, so clients can commit with
+          confidence rather than assumption.
+        </p>
+        <p>
+          Materiality is chosen for how it ages, not just how it photographs. Lighting is layered for
+          task, mood and wayfinding. Acoustics are treated as a design material in their own right.
+          And every layout is pressure-tested against circulation, storage, and the realities of
+          day-to-day operation.
+        </p>
+        <p>
+          The result is interiors that feel considered from the moment you step inside — and that
+          continue to perform years later, when the novelty has worn off and the space has to earn
+          its keep.
+        </p>
+      </div>
+
+      <!-- Scope of work — magazine-style two-column service list -->
+      <div class="magazine__scope reveal">
+        <div class="magazine__scope-head">
+          <p class="eyebrow">Scope of work</p>
+          <span class="eyebrow">What we deliver</span>
+        </div>
+
+        <ul class="magazine__scope-list">
+          <li>
+            <span class="scope-num">01</span>
+            <span class="scope-body">
+              <span class="scope-title">Spatial planning &amp; concept design</span>
+              <span class="scope-copy">Layouts, circulation, zoning and early concept direction tested against real use.</span>
+            </span>
+          </li>
+          <li>
+            <span class="scope-num">02</span>
+            <span class="scope-body">
+              <span class="scope-title">Material &amp; finishes selection</span>
+              <span class="scope-copy">Palettes chosen for durability, tactility and how they age over time.</span>
+            </span>
+          </li>
+          <li>
+            <span class="scope-num">03</span>
+            <span class="scope-body">
+              <span class="scope-title">Lighting &amp; acoustic design</span>
+              <span class="scope-copy">Layered lighting and acoustic strategy for task, mood and comfort.</span>
+            </span>
+          </li>
+          <li>
+            <span class="scope-num">04</span>
+            <span class="scope-body">
+              <span class="scope-title">FF&amp;E specification &amp; procurement</span>
+              <span class="scope-copy">Furniture, fixtures and equipment specified, sourced and coordinated.</span>
+            </span>
+          </li>
+          <li>
+            <span class="scope-num">05</span>
+            <span class="scope-body">
+              <span class="scope-title">Technical documentation</span>
+              <span class="scope-copy">Drawings and details prepared for tender, construction and authority review.</span>
+            </span>
+          </li>
+          <li>
+            <span class="scope-num">06</span>
+            <span class="scope-body">
+              <span class="scope-title">On-site review &amp; handover</span>
+              <span class="scope-copy">Site inspections, snagging and close-out through to final handover.</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Three-step process: Listen / Test / Deliver -->
+      <ol class="magazine__steps reveal">
+        <li>
+          <span class="step-num">01</span>
+          <span class="step-title">Listen</span>
+          <span class="step-copy">Brief, site, constraints and the people who will use the space.</span>
+        </li>
+        <li>
+          <span class="step-num">02</span>
+          <span class="step-title">Test</span>
+          <span class="step-copy">Options, materials, light and cost — tested against real use.</span>
+        </li>
+        <li>
+          <span class="step-num">03</span>
+          <span class="step-title">Deliver</span>
+          <span class="step-copy">Documentation, coordination, and on-site review through to handover.</span>
+        </li>
+      </ol>
+
+      <!-- Sample projects — magazine grid -->
+      <div class="magazine__samples">
+        <div class="magazine__samples-head reveal">
+          <p class="eyebrow">Sample projects</p>
+          <span class="eyebrow">Placeholder imagery</span>
+        </div>
+
+        <div class="magazine__samples-grid">
+          <article class="card card--lead reveal">
+            <div class="card__img-wrap">
+              <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1600&q=80" alt="Placeholder interior project — living space" loading="lazy" />
+            </div>
+            <div class="card__meta">
+              <h3>Sample Project 01</h3>
+              <span>Interiors · Placeholder</span>
+            </div>
+          </article>
+
+          <article class="card card--side reveal">
+            <div class="card__img-wrap">
+              <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80" alt="Placeholder interior project — detail" loading="lazy" />
+            </div>
+            <div class="card__meta">
+              <h3>Sample Project 02</h3>
+              <span>Interiors · Placeholder</span>
+            </div>
+          </article>
+
+          <article class="card card--half reveal">
+            <div class="card__img-wrap">
+              <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=80" alt="Placeholder interior project — workspace" loading="lazy" />
+            </div>
+            <div class="card__meta">
+              <h3>Sample Project 03</h3>
+              <span>Interiors · Placeholder</span>
+            </div>
+          </article>
+
+          <article class="card card--half reveal">
+            <div class="card__img-wrap">
+              <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80" alt="Placeholder interior project — hospitality" loading="lazy" />
+            </div>
+            <div class="card__meta">
+              <h3>Sample Project 04</h3>
+              <span>Interiors · Placeholder</span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Closing CTA -->
+      <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
+        <p>To discuss an interior project, get in touch:</p>
+        <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
+      </div>
+
     </div>
   </section>
   
