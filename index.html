@@ -709,6 +709,26 @@
 
   .view-body p + p { margin-top: 1.25rem; }
 
+  /* ---------- Sample projects grid (inside Interior Design view) ---------- */
+  .sample-projects {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-top: 2.5rem;
+    max-width: none;
+  }
+
+  .sample-projects .card {
+    aspect-ratio: 4 / 3;
+  }
+
+  @media (max-width: 900px) {
+    .sample-projects { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .sample-projects { grid-template-columns: 1fr; }
+  }
+
   .back-btn {
     display: inline-flex;
     align-items: center;
@@ -817,7 +837,7 @@
 
       <!-- Company logo, top-left, below the fixed header — 50% smaller & transparent -->
       <div class="hero__logo">
-        <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/MGdeco-logo-transparent-for-dark-bg.png" alt="MG Design Engineering logo" />
+        <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/MGdeco-logo-light.svg" alt="MG Design Engineering logo" />
       </div>
 
       <div class="wrap hero__inner">
@@ -852,7 +872,7 @@
       <div class="intro__services">
         <ul class="services" aria-label="Our services">
           <li>
-            <a href="#" data-route="work">
+            <a href="#" data-route="interior-design">
               <span>Interior Design</span>
               <span class="arrow" aria-hidden="true">→</span>
             </a>
@@ -1011,12 +1031,12 @@
         </h2>
       </div>
 
-      <!-- Row 2 — "Our services" aligns with the first item; now with arrows & links -->
+      <!-- Row 2 — "Our services" aligns with the first item; Interior Design routes to its own view -->
       <p class="eyebrow intro__eyebrow-services">Our services</p>
       <div class="intro__services">
         <ul class="services" aria-label="Our services">
           <li>
-            <a href="#" data-route="work">
+            <a href="#" data-route="interior-design">
               <span>Interior Design</span>
               <span class="arrow" aria-hidden="true">→</span>
             </a>
@@ -1052,6 +1072,60 @@
     <!-- CTA -->
     <div class="wrap view-body" style="padding-top: 0; padding-bottom: clamp(3rem, 6vw, 5rem); max-width: 62ch;">
       <p>Not sure which service fits your brief? Start with a conversation.</p>
+      <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
+    </div>
+  </section>
+
+  <!-- ============ INTERIOR DESIGN VIEW (How we work + sample projects) ============ -->
+  <section class="view" data-view="interior-design" aria-label="Interior Design">
+    <div class="wrap view-header">
+      <div>
+        <p class="eyebrow">Interior Design</p>
+        <h1>How we work</h1>
+      </div>
+      <button class="back-btn" data-route="Services"><span class="arrow">←</span> Back to services</button>
+    </div>
+    <div class="wrap view-body" style="max-width: 62ch;">
+      <p>Interior design at MG Design Engineering is about making spaces that work as hard as they look. We balance spatial planning, materiality, lighting, and acoustics to create interiors that support the people who use them and reinforce the identity of the places they sit within.</p>
+      <p>Our process moves through three clear stages — <strong>Listen</strong>, <strong>Test</strong>, and <strong>Deliver</strong> — so every decision is grounded in how the space will actually be used, operated, and maintained.</p>
+    </div>
+
+    <!-- Sample projects — placeholder images -->
+    <div class="wrap" style="padding-bottom: clamp(3rem, 6vw, 5rem);">
+      <p class="eyebrow" style="margin-bottom: 1.25rem;">Sample projects</p>
+      <div class="sample-projects">
+        <article class="card reveal">
+          <div class="card__img-wrap">
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80" alt="Placeholder interior project one" loading="lazy" />
+          </div>
+          <div class="card__meta">
+            <h3>Sample Project 01</h3>
+            <span>Interiors · Placeholder</span>
+          </div>
+        </article>
+        <article class="card reveal">
+          <div class="card__img-wrap">
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80" alt="Placeholder interior project two" loading="lazy" />
+          </div>
+          <div class="card__meta">
+            <h3>Sample Project 02</h3>
+            <span>Interiors · Placeholder</span>
+          </div>
+        </article>
+        <article class="card reveal">
+          <div class="card__img-wrap">
+            <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80" alt="Placeholder interior project three" loading="lazy" />
+          </div>
+          <div class="card__meta">
+            <h3>Sample Project 03</h3>
+            <span>Interiors · Placeholder</span>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="wrap view-body" style="padding-top: 0; padding-bottom: clamp(3rem, 6vw, 5rem); max-width: 62ch;">
+      <p>To discuss an interior project, get in touch:</p>
       <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
     </div>
   </section>
