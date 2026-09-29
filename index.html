@@ -700,7 +700,7 @@
   }
 
   @media (min-width: 761px) {
-    .view.is-active:not([data-view="interior-design"]) > .view-body {
+    .view.is-active:not([data-view="interior-design"]):not([data-view="architecture"]):not([data-view="urban-design"]) > .view-body {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -711,7 +711,7 @@
 
   .view-body p + p { margin-top: 1.25rem; }
 
-  /* ---------- Magazine layout (Interior Design flow) ---------- */
+  /* ---------- Magazine layout (Interior + Architecture + Urban flows) ---------- */
   .magazine {
     padding-block: clamp(3rem, 7vw, 5rem) clamp(4rem, 9vw, 7rem);
   }
@@ -999,12 +999,10 @@
   }
   .back-btn:hover { gap: 0.9rem; color: var(--accent); border-color: var(--accent); }
 
-  /* ---------- Interior Design flow: header replaced by burger ---------- */
+  /* ---------- Interior Design + Architecture + Urban Design flows ---------- */
   body.is-interior #siteHeader { display: none; }
   body.is-interior main { padding-top: 0; }
 
-  /* Fixed paper background bar behind the interior design flow chrome.
-     Height matches the landing-page header (--header-h = 64px). */
   .interior-chrome-bar {
     position: fixed;
     top: 0;
@@ -1019,7 +1017,6 @@
   }
   body.is-interior .interior-chrome-bar { display: block; }
 
-  /* Burger — vertically centered inside the --header-h bar */
   .burger-fab {
     position: fixed;
     top: calc((var(--header-h) - 44px) / 2);
@@ -1058,7 +1055,6 @@
     outline-offset: 3px;
   }
 
-  /* Logo — sized and positioned to match the landing-page .logo */
   .interior-logo {
     position: fixed;
     top: 0;
@@ -1066,12 +1062,12 @@
     z-index: 70;
     display: none;
     font-family: Georgia, serif;
-    font-size: 1.25rem;                 /* match landing-page .logo */
-    letter-spacing: 0.02em;             /* match landing-page .logo */
+    font-size: 1.25rem;
+    letter-spacing: 0.02em;
     color: var(--ink);
     text-decoration: none;
     cursor: pointer;
-    line-height: var(--header-h);       /* vertically centered in bar */
+    line-height: var(--header-h);
     height: var(--header-h);
     white-space: nowrap;
     overflow: hidden;
@@ -1114,10 +1110,12 @@
   .burger-menu a:focus-visible { color: var(--accent); outline: none; }
 
   /* =========================================================
-     INTERIOR DESIGN VIEW — CARD-OVER-CARD STACK
+     INTERIOR DESIGN + ARCHITECTURE + URBAN DESIGN — CARD STACK
      ========================================================= */
 
-  .view[data-view="interior-design"].is-active {
+  .view[data-view="interior-design"].is-active,
+  .view[data-view="architecture"].is-active,
+  .view[data-view="urban-design"].is-active {
     display: block;
     min-height: 0;
   }
@@ -1161,7 +1159,6 @@
     );
   }
 
-  /* Hero inner — clears the fixed chrome bar (--header-h) */
   .idv__hero-inner {
     position: relative;
     z-index: 2;
@@ -1182,7 +1179,6 @@
     max-width: 16ch;
   }
 
-  /* ---------- View index list (under "How we work") ---------- */
   .idv__index {
     list-style: none;
     display: grid;
@@ -1276,17 +1272,15 @@
     50%      { transform: scaleX(1);    opacity: 1; }
   }
 
-  /* ---------- The stacked cards (square corners) ---------- */
   .idv__content {
     position: relative;
     background: var(--paper);
-    border-radius: 0;              /* no fillet corners */
+    border-radius: 0;
     box-shadow: 0 -36px 72px -26px rgba(20, 17, 15, 0.5);
     margin-top: -1px;
     scroll-margin-top: var(--header-h);
   }
 
-  /* Cards that match the hero's viewport height and centre their content */
   .idv__content--viewport {
     min-height: 100vh;
     min-height: 100dvh;
@@ -1305,19 +1299,16 @@
     }
   }
 
-  /* Increasing z-index so each card stacks over the one before */
   .idv__content[data-stack="1"] { z-index: 1; }
   .idv__content[data-stack="2"] { z-index: 2; }
   .idv__content[data-stack="3"] { z-index: 3; }
   .idv__content[data-stack="4"] { z-index: 4; }
 
-  /* JS adds .is-pinned + sets the `top` value for all but the last card */
   .idv__content.is-pinned {
     position: sticky;
     top: 0;
   }
 
-  /* Small "continue" cue at the tail of the first three cards */
   .stack-cue {
     display: inline-flex;
     align-items: center;
@@ -1379,10 +1370,8 @@
      MOBILE OPTIMIZATION
      ========================================================= */
 
-  /* No blue tap flash on touch */
   * { -webkit-tap-highlight-color: transparent; }
 
-  /* Faster, more responsive taps on interactive elements */
   button,
   a,
   [role="button"],
@@ -1391,7 +1380,6 @@
     touch-action: manipulation;
   }
 
-  /* Disable hover-only effects on touch devices (they otherwise stick) */
   @media (hover: none) {
     .card:hover img { transform: none; }
     .card:hover .card__meta { transform: translateY(8px); opacity: 0.95; }
@@ -1408,18 +1396,11 @@
     .idv__index button:hover .idx-arrow { opacity: 0; transform: translateX(-6px); }
   }
 
-  /* ---------- Small screens (≤ 760px) ---------- */
   @media (max-width: 760px) {
-    :root {
-      --gutter: 1.25rem;
-    }
+    :root { --gutter: 1.25rem; }
 
-    body {
-      font-size: 16px;
-      line-height: 1.6;
-    }
+    body { font-size: 16px; line-height: 1.6; }
 
-    /* Header */
     .nav { padding-block: 0.85rem; }
     .logo { font-size: 1.05rem; }
     .menu-toggle {
@@ -1428,21 +1409,13 @@
       border-radius: 6px;
     }
 
-    /* Home hero */
     .hero {
       min-height: 92vh;
       min-height: 92dvh;
     }
-    /* Fixed background attachment is janky / broken on iOS — use scroll */
-    .hero__placeholder {
-      background-attachment: scroll;
-    }
-    .hero__inner {
-      padding-block: 2.5rem 5rem;
-    }
-    .hero .display {
-      font-size: clamp(2.1rem, 10vw, 3.25rem);
-    }
+    .hero__placeholder { background-attachment: scroll; }
+    .hero__inner { padding-block: 2.5rem 5rem; }
+    .hero .display { font-size: clamp(2.1rem, 10vw, 3.25rem); }
     .hero .eyebrow {
       font-size: 0.68rem;
       letter-spacing: 0.14em;
@@ -1454,22 +1427,10 @@
       max-width: 100%;
     }
     .hero__logo { width: 54px; }
-    .hero__dots {
-      gap: 0.85rem;
-      bottom: 1rem;
-    }
-    /* Larger tap targets for the hero dots */
-    .hero__dot {
-      width: 12px;
-      height: 12px;
-      border-width: 1.5px;
-    }
+    .hero__dots { gap: 0.85rem; bottom: 1rem; }
+    .hero__dot { width: 12px; height: 12px; border-width: 1.5px; }
 
-    /* Intro / studio */
-    .intro {
-      padding-block: 2.75rem 3rem;
-      row-gap: 1.75rem;
-    }
+    .intro { padding-block: 2.75rem 3rem; row-gap: 1.75rem; }
     .intro h2 {
       font-size: clamp(1.25rem, 5.4vw, 1.6rem);
       line-height: 1.3;
@@ -1480,19 +1441,15 @@
       padding-block: 0.95rem;
     }
 
-    /* Project grid */
     .section-block { padding-block: 3rem; }
     .section-head {
       padding-block: 0 1.25rem;
       flex-wrap: wrap;
       gap: 0.75rem;
     }
-    .section-head .display {
-      font-size: clamp(1.65rem, 7vw, 2.1rem) !important;
-    }
+    .section-head .display { font-size: clamp(1.65rem, 7vw, 2.1rem) !important; }
     .projects { gap: 0.85rem; }
 
-    /* Card meta — always visible on touch, no hover dependency */
     .card__meta {
       padding: 1rem 1.1rem;
       transform: none;
@@ -1506,167 +1463,81 @@
       opacity: 0.85;
     }
 
-    /* Insights */
-    .insights {
-      padding-block: 3rem;
-      gap: 1.75rem;
-    }
-    .insights__body h2 {
-      font-size: clamp(1.35rem, 5.6vw, 1.85rem);
-    }
+    .insights { padding-block: 3rem; gap: 1.75rem; }
+    .insights__body h2 { font-size: clamp(1.35rem, 5.6vw, 1.85rem); }
     .insights__body p { margin-bottom: 1.5rem; }
 
-    /* Buttons */
-    .btn {
-      font-size: 0.78rem;
-      min-height: 36px;
-    }
+    .btn { font-size: 0.78rem; min-height: 36px; }
 
-    /* Footer */
     footer { padding-block: 2.25rem 1.75rem; }
-    .footer-grid {
-      gap: 1.75rem;
-      margin-bottom: 2rem;
-    }
-    .footer-bottom {
-      padding-top: 1.5rem;
-      font-size: 0.78rem;
-      gap: 0.5rem;
-    }
+    .footer-grid { gap: 1.75rem; margin-bottom: 2rem; }
+    .footer-bottom { padding-top: 1.5rem; font-size: 0.78rem; gap: 0.5rem; }
 
-    /* Simple views */
     .view-header {
       padding-block: 2.5rem 1.5rem;
       gap: 0.75rem;
       align-items: flex-end;
     }
-    .view-header h1 {
-      font-size: clamp(1.65rem, 7vw, 2.4rem);
-    }
-    .view-body {
-      padding-block: 2.5rem;
-      font-size: 0.98rem;
-    }
+    .view-header h1 { font-size: clamp(1.65rem, 7vw, 2.4rem); }
+    .view-body { padding-block: 2.5rem; font-size: 0.98rem; }
 
-    /* Magazine layout */
-    .magazine {
-      padding-block: 2.5rem 3.5rem;
-    }
-    .magazine__lead {
-      margin-bottom: 1.75rem;
-      aspect-ratio: 4 / 3;
-    }
+    .magazine { padding-block: 2.5rem 3.5rem; }
+    .magazine__lead { margin-bottom: 1.75rem; aspect-ratio: 4 / 3; }
     .magazine__standfirst {
       font-size: clamp(1.15rem, 4.8vw, 1.45rem);
       margin-bottom: 1.25rem;
     }
     .magazine__dropcap { font-size: 0.98rem; }
-    .magazine__dropcap::first-letter {
-      font-size: 3.6em;
-      padding: 0.06em 0.1em 0 0;
-    }
-    .magazine__pullquote {
-      padding-block: 1.5rem;
-      margin-block: 2rem;
-      gap: 0.75rem;
-    }
+    .magazine__dropcap::first-letter { font-size: 3.6em; padding: 0.06em 0.1em 0 0; }
+    .magazine__pullquote { padding-block: 1.5rem; margin-block: 2rem; gap: 0.75rem; }
     .magazine__pullquote::before { font-size: 3rem; }
-    .magazine__pullquote p {
-      font-size: clamp(1.1rem, 4.6vw, 1.35rem);
-    }
+    .magazine__pullquote p { font-size: clamp(1.1rem, 4.6vw, 1.35rem); }
 
-    /* Process steps */
     .magazine__steps {
       grid-template-columns: 1fr;
       gap: 2rem;
       padding-top: 1.75rem;
       margin-top: 2rem;
     }
-    .magazine__steps .step-media {
-      aspect-ratio: 16 / 9;
-      margin-bottom: 0.85rem;
-    }
+    .magazine__steps .step-media { aspect-ratio: 16 / 9; margin-bottom: 0.85rem; }
     .magazine__steps .step-num { font-size: 0.95rem; }
-    .magazine__steps .step-title {
-      font-size: clamp(1.2rem, 5vw, 1.5rem);
-    }
+    .magazine__steps .step-title { font-size: clamp(1.2rem, 5vw, 1.5rem); }
     .magazine__steps .step-copy { font-size: 0.92rem; }
 
-    /* Section headings inside cards */
-    .magazine__section-head {
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .magazine__section-title {
-      font-size: clamp(1.4rem, 6.2vw, 1.9rem);
-    }
-    .back-btn {
-      font-size: 0.74rem;
-      padding-bottom: 0.35rem;
-      min-height: 36px;
-    }
+    .magazine__section-head { gap: 0.5rem; margin-bottom: 1.5rem; }
+    .magazine__section-title { font-size: clamp(1.4rem, 6.2vw, 1.9rem); }
+    .back-btn { font-size: 0.74rem; padding-bottom: 0.35rem; min-height: 36px; }
 
-    /* Scope list */
-    .magazine__scope-list {
-      grid-template-columns: 1fr;
-      row-gap: 1.1rem;
-    }
-    .magazine__scope-list li {
-      padding-bottom: 1rem;
-      gap: 0.85rem;
-    }
-    .magazine__scope-list .scope-num {
-      font-size: 0.8rem;
-      min-width: 1.75rem;
-    }
+    .magazine__scope-list { grid-template-columns: 1fr; row-gap: 1.1rem; }
+    .magazine__scope-list li { padding-bottom: 1rem; gap: 0.85rem; }
+    .magazine__scope-list .scope-num { font-size: 0.8rem; min-width: 1.75rem; }
     .magazine__scope-list .scope-title { font-size: 1.05rem; }
     .magazine__scope-list .scope-copy { font-size: 0.9rem; }
 
-    /* Samples grid */
     .magazine__samples-grid { gap: 0.85rem; }
     .magazine__samples-grid .card { aspect-ratio: 4 / 3; }
 
-    /* ---------- Interior design flow ---------- */
-    .idv__hero {
-      height: 92vh;
-      height: 92dvh;
-    }
+    .idv__hero { height: 92vh; height: 92dvh; }
     .idv__hero-inner {
       padding-top: calc(var(--header-h) + 1.5rem);
       padding-bottom: 2.5rem;
     }
-    .idv__hero .eyebrow {
-      font-size: 0.68rem;
-      margin-bottom: 0.6rem;
-    }
+    .idv__hero .eyebrow { font-size: 0.68rem; margin-bottom: 0.6rem; }
     .idv__hero .display {
       font-size: clamp(1.9rem, 9vw, 2.8rem);
       max-width: 14ch;
     }
 
-    /* Index list — comfortable tap targets */
-    .idv__index {
-      max-width: none;
-      margin-top: 1.5rem;
-    }
+    .idv__index { max-width: none; margin-top: 1.5rem; }
     .idv__index button {
       min-height: 48px;
       padding-block: 0.75rem;
       gap: 0.85rem;
     }
-    .idv__index .idx-num {
-      font-size: 0.72rem;
-      min-width: 1.65rem;
-    }
-    .idv__index .idx-label {
-      font-size: clamp(1rem, 4.6vw, 1.18rem);
-    }
-    .idv__index .idx-arrow {
-      opacity: 0.5;
-      transform: none;
-    }
+    .idv__index .idx-num { font-size: 0.72rem; min-width: 1.65rem; }
+    .idv__index .idx-label { font-size: clamp(1rem, 4.6vw, 1.18rem); }
+    .idv__index .idx-arrow { opacity: 0.5; transform: none; }
 
-    /* Continue / scroll cues */
     .stack-cue {
       padding-top: 2rem;
       font-size: 0.62rem;
@@ -1678,13 +1549,11 @@
       padding-top: 1.5rem;
     }
 
-    /* Viewport-height cards match the hero */
     .idv__content--viewport {
       min-height: 92vh;
       min-height: 92dvh;
     }
 
-    /* Fixed chrome */
     .burger-fab {
       top: calc((var(--header-h) - 44px) / 2);
       width: 44px;
@@ -1695,17 +1564,10 @@
       max-width: calc(100vw - 2 * var(--gutter) - 64px);
     }
 
-    /* Burger menu overlay */
-    .burger-menu ul {
-      padding-inline: var(--gutter);
-      gap: 0.75rem;
-    }
-    .burger-menu a {
-      font-size: clamp(1.5rem, 6vw, 2.25rem);
-    }
+    .burger-menu ul { padding-inline: var(--gutter); gap: 0.75rem; }
+    .burger-menu a { font-size: clamp(1.5rem, 6vw, 2.25rem); }
   }
 
-  /* ---------- Extra small screens (≤ 400px) ---------- */
   @media (max-width: 400px) {
     .hero .display { font-size: 1.95rem; }
     .idv__hero .display { font-size: 1.75rem; }
@@ -1714,7 +1576,6 @@
     .magazine__section-title { font-size: 1.35rem; }
   }
 
-  /* ---------- Landscape phones — don't let heroes eat the viewport ---------- */
   @media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
     .hero,
     .idv__hero {
@@ -1732,7 +1593,6 @@
     }
   }
 
-  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after {
@@ -1786,7 +1646,7 @@
   </div>
 </header>
 
-<!-- Paper background bar for the Interior Design flow chrome -->
+<!-- Paper background bar for the Interior Design + Architecture + Urban Design flow chrome -->
 <div class="interior-chrome-bar" aria-hidden="true"></div>
 
 <button class="burger-fab" id="burgerFab" type="button"
@@ -1799,7 +1659,7 @@
 <a href="#" class="interior-logo" data-route="home">MG Design Engineering Company</a>
 
 <div class="burger-menu" id="burgerMenu" aria-hidden="true">
-  <nav aria-label="Interior design menu">
+  <nav aria-label="Section menu">
     <ul>
       <li><a href="#" data-route="home">Home</a></li>
       <li><a href="#" data-route="Services">Services</a></li>
@@ -1853,8 +1713,8 @@
       <div class="intro__services">
         <ul class="services" aria-label="Our services">
           <li><a href="#" data-route="interior-design"><span>Interior Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="work"><span>Architecture Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="work"><span>Urban Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#" data-route="architecture"><span>Architecture Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#" data-route="urban-design"><span>Urban Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
           <li><a href="#" data-route="work"><span>Urban Solution Strategy</span><span class="arrow" aria-hidden="true">→</span></a></li>
           <li><a href="#" data-route="work"><span>Project Management</span><span class="arrow" aria-hidden="true">→</span></a></li>
         </ul>
@@ -1965,8 +1825,8 @@
       <div class="intro__services">
         <ul class="services" aria-label="Our services">
           <li><a href="#" data-route="interior-design"><span>Interior Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="work"><span>Architecture Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="work"><span>Urban Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#" data-route="architecture"><span>Architecture Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
+          <li><a href="#" data-route="urban-design"><span>Urban Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
           <li><a href="#" data-route="work"><span>Urban Solution Strategy</span><span class="arrow" aria-hidden="true">→</span></a></li>
           <li><a href="#" data-route="work"><span>Project Management</span><span class="arrow" aria-hidden="true">→</span></a></li>
         </ul>
@@ -1979,18 +1839,10 @@
     </div>
   </section>
 
-  <!-- ============ INTERIOR DESIGN VIEW ============
-       One view, four stacked cards:
-         1. Overview (article)
-         2. What we deliver (viewport height)
-         3. Our process (viewport height, with step images)
-         4. Samples of work
-       Hero carries an index list that scrolls to each card.
-       As each card is covered by the next, it fades out. -->
+  <!-- ============ INTERIOR DESIGN VIEW ============ -->
   <section class="view" data-view="interior-design" aria-label="Interior Design">
     <div class="idv">
 
-      <!-- Pinned hero -->
       <div class="idv__hero">
         <div class="idv__hero-bg"
              style="background-image: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=2400&q=80');"
@@ -2001,7 +1853,6 @@
           <p class="eyebrow">Interior Design</p>
           <h1 class="display">How we work</h1>
 
-          <!-- Index list: each item scrolls to its card -->
           <ul class="idv__index" aria-label="Interior design sections">
             <li>
               <button type="button" data-scroll-to="idv-overview">
@@ -2037,7 +1888,6 @@
         </div>
       </div>
 
-      <!-- ---------- Card 1 — Overview (article) ---------- -->
       <div class="idv__content" data-stack="1" id="idv-overview">
         <div class="wrap magazine">
 
@@ -2087,7 +1937,6 @@
         </div>
       </div>
 
-      <!-- ---------- Card 2 — What we deliver (viewport height) ---------- -->
       <div class="idv__content idv__content--viewport" data-stack="2" id="idv-deliver">
         <div class="wrap magazine">
 
@@ -2149,7 +1998,6 @@
         </div>
       </div>
 
-      <!-- ---------- Card 3 — Our process (viewport height, step images) ---------- -->
       <div class="idv__content idv__content--viewport" data-stack="3" id="idv-process">
         <div class="wrap magazine">
 
@@ -2193,7 +2041,6 @@
         </div>
       </div>
 
-      <!-- ---------- Card 4 — Samples of work (last, no pin) ---------- -->
       <div class="idv__content" data-stack="4" id="idv-samples">
         <div class="wrap magazine">
 
@@ -2249,6 +2096,548 @@
 
           <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
             <p>To discuss an interior project, get in touch:</p>
+            <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ ARCHITECTURE VIEW ============ -->
+  <section class="view" data-view="architecture" aria-label="Architecture">
+    <div class="idv">
+
+      <div class="idv__hero">
+        <div class="idv__hero-bg"
+             style="background-image: url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=2400&q=80');"
+             aria-hidden="true"></div>
+        <div class="idv__hero-scrim" aria-hidden="true"></div>
+
+        <div class="wrap idv__hero-inner">
+          <p class="eyebrow">Architecture</p>
+          <h1 class="display">How we design</h1>
+
+          <ul class="idv__index" aria-label="Architecture sections">
+            <li>
+              <button type="button" data-scroll-to="arch-overview">
+                <span class="idx-num">01</span>
+                <span class="idx-label">Overview</span>
+                <span class="idx-arrow" aria-hidden="true">→</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-scroll-to="arch-deliver">
+                <span class="idx-num">02</span>
+                <span class="idx-label">What we deliver</span>
+                <span class="idx-arrow" aria-hidden="true">→</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-scroll-to="arch-process">
+                <span class="idx-num">03</span>
+                <span class="idx-label">Our process</span>
+                <span class="idx-arrow" aria-hidden="true">→</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-scroll-to="arch-samples">
+                <span class="idx-num">04</span>
+                <span class="idx-label">Samples of work</span>
+                <span class="idx-arrow" aria-hidden="true">→</span>
+              </button>
+            </li>
+          </ul>
+
+          <span class="idv__cue">Scroll</span>
+        </div>
+      </div>
+
+      <div class="idv__content" data-stack="1" id="arch-overview">
+        <div class="wrap magazine">
+
+          <figure class="magazine__lead reveal">
+            <img src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=2000&q=80" alt="Architecture lead image — geometric glass tower at dusk" loading="lazy" />
+          </figure>
+
+          <div class="magazine__intro reveal">
+            <p class="magazine__standfirst">
+              Buildings that hold their ground — form, structure and material resolved against site,
+              climate, and the way people will actually move through them.
+            </p>
+            <p class="magazine__dropcap">
+              Architecture at MG Design Engineering begins with the site and the brief in equal measure.
+              We read orientation, access, context and constraint before a line is drawn — so the building
+              that emerges is shaped by where it stands and who it serves, not by a style applied after
+              the fact.
+            </p>
+          </div>
+
+          <aside class="magazine__pullquote reveal">
+            <p>A building earns its place when it works for the city, the client, and the people inside it.</p>
+          </aside>
+
+          <div class="magazine__columns reveal">
+            <p>
+              We work across residential, workplace, cultural, and mixed-use buildings — from feasibility
+              and concept design through to technical documentation, tender, and on-site review. Each
+              stage is structured to reduce risk and sharpen the design, so clients can commit with
+              confidence rather than assumption.
+            </p>
+            <p>
+              Structure and services are treated as part of the architecture, not a layer applied beneath
+              it. Environmental strategy — daylight, thermal performance, ventilation — is tested from the
+              earliest massing studies. Materials are chosen for how they weather, not just how they
+              render.
+            </p>
+            <p>
+              The result is buildings that feel inevitable on their site — and that continue to perform
+              decades later, when the drawings have long been filed away and the building has to stand
+              on its own.
+            </p>
+          </div>
+
+          <span class="stack-cue reveal">Continue — what we deliver</span>
+
+        </div>
+      </div>
+
+      <div class="idv__content idv__content--viewport" data-stack="2" id="arch-deliver">
+        <div class="wrap magazine">
+
+          <div class="magazine__section-head reveal">
+            <div>
+              <p class="eyebrow">Scope of work</p>
+              <h2 class="magazine__section-title">What we deliver</h2>
+            </div>
+            <span class="eyebrow">Six disciplines</span>
+          </div>
+
+          <ul class="magazine__scope-list reveal" style="border-top: none; padding-top: 0; margin-top: 0;">
+            <li>
+              <span class="scope-num">01</span>
+              <span class="scope-body">
+                <span class="scope-title">Concept &amp; feasibility studies</span>
+                <span class="scope-copy">Site analysis, massing options and early viability tested before commitment.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">02</span>
+              <span class="scope-body">
+                <span class="scope-title">Planning &amp; authority approvals</span>
+                <span class="scope-copy">Documentation, submissions and liaison through to consent.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">03</span>
+              <span class="scope-body">
+                <span class="scope-title">Technical design &amp; documentation</span>
+                <span class="scope-copy">Coordinated drawings and details prepared for tender and construction.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">04</span>
+              <span class="scope-body">
+                <span class="scope-title">Structural &amp; MEP coordination</span>
+                <span class="scope-copy">Engineering and services integrated into the architectural intent.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">05</span>
+              <span class="scope-body">
+                <span class="scope-title">Tender &amp; construction support</span>
+                <span class="scope-copy">Contractor selection, RFIs and design intent maintained on site.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">06</span>
+              <span class="scope-body">
+                <span class="scope-title">Site supervision &amp; handover</span>
+                <span class="scope-copy">Inspections, snagging and close-out through to final handover.</span>
+              </span>
+            </li>
+          </ul>
+
+          <span class="stack-cue reveal">Continue — our process</span>
+
+        </div>
+      </div>
+
+      <div class="idv__content idv__content--viewport" data-stack="3" id="arch-process">
+        <div class="wrap magazine">
+
+          <div class="magazine__section-head reveal">
+            <div>
+              <p class="eyebrow">Our process</p>
+              <h2 class="magazine__section-title">Three steps, every project</h2>
+            </div>
+            <span class="eyebrow">Explore · Resolve · Realise</span>
+          </div>
+
+          <ol class="magazine__steps reveal" style="border-top: none; padding-top: 0; margin-top: 0;">
+            <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1503389152951-9f343605f61e?auto=format&fit=crop&w=1200&q=80" alt="Explore — architect reading the site and brief" loading="lazy" />
+              </figure>
+              <span class="step-num">01</span>
+              <span class="step-title">Explore</span>
+              <span class="step-copy">Site, brief, constraints and the wider context — read before a line is drawn.</span>
+            </li>
+            <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1200&q=80" alt="Resolve — form, structure and material brought into agreement" loading="lazy" />
+              </figure>
+              <span class="step-num">02</span>
+              <span class="step-title">Resolve</span>
+              <span class="step-copy">Massing, structure, materials and environmental strategy tested against cost.</span>
+            </li>
+            <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1470723710355-95304d8aece4?auto=format&fit=crop&w=1200&q=80" alt="Realise — completed building with public realm" loading="lazy" />
+              </figure>
+              <span class="step-num">03</span>
+              <span class="step-title">Realise</span>
+              <span class="step-copy">Documentation, coordination and on-site review through to handover.</span>
+            </li>
+          </ol>
+
+          <span class="stack-cue reveal">Continue — samples of work</span>
+
+        </div>
+      </div>
+
+      <div class="idv__content" data-stack="4" id="arch-samples">
+        <div class="wrap magazine">
+
+          <div class="magazine__section-head reveal">
+            <div>
+              <p class="eyebrow">Samples of work</p>
+              <h2 class="magazine__section-title">Recent architecture work</h2>
+            </div>
+            <span class="eyebrow">Placeholder imagery</span>
+          </div>
+
+          <div class="magazine__samples-grid reveal">
+            <article class="card card--lead">
+              <div class="card__img-wrap">
+                <img src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=80" alt="Placeholder architecture project — glass tower" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Harbour Point</h3>
+                <span>Mixed-use · Placeholder</span>
+              </div>
+            </article>
+
+            <article class="card card--side">
+              <div class="card__img-wrap">
+                <img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1200&q=80" alt="Placeholder architecture project — minimal concrete house" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Villa Norr</h3>
+                <span>Residential · Placeholder</span>
+              </div>
+            </article>
+
+            <article class="card card--half">
+              <div class="card__img-wrap">
+                <img src="https://images.unsplash.com/photo-1470723710355-95304d8aece4?auto=format&fit=crop&w=1400&q=80" alt="Placeholder architecture project — cultural building and plaza" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Civic Hall</h3>
+                <span>Cultural · Placeholder</span>
+              </div>
+            </article>
+
+            <article class="card card--half">
+              <div class="card__img-wrap">
+                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1400&q=80" alt="Placeholder architecture project — masterplan aerial" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>North Quarter</h3>
+                <span>Masterplan · Placeholder</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
+            <p>To discuss an architecture project, get in touch:</p>
+            <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ URBAN DESIGN VIEW ============
+       Same card-over-card structure as Interior Design and Architecture:
+         1. Overview (article)
+         2. What we deliver (viewport height)
+         3. Our process (viewport height, with step images)
+         4. Samples of work
+       Hero carries an index list that scrolls to each card. -->
+  <section class="view" data-view="urban-design" aria-label="Urban Design">
+    <div class="idv">
+
+      <div class="idv__hero">
+        <div class="idv__hero-bg"
+             style="background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=2400&q=80');"
+             aria-hidden="true"></div>
+        <div class="idv__hero-scrim" aria-hidden="true"></div>
+
+        <div class="wrap idv__hero-inner">
+          <p class="eyebrow">Urban Design</p>
+          <h1 class="display">How we shape cities</h1>
+
+          <ul class="idv__index" aria-label="Urban design sections">
+            <li>
+              <button type="button" data-scroll-to="urban-overview">
+                <span class="idx-num">01</span>
+                <span class="idx-label">Overview</span>
+                <span class="idx-arrow" aria-hidden="true">→</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-scroll-to="urban-deliver">
+                <span class="idx-num">02</span>
+                <span class="idx-label">What we deliver</span>
+                <span class="idx-arrow" aria-hidden="true">→</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-scroll-to="urban-process">
+                <span class="idx-num">03</span>
+                <span class="idx-label">Our process</span>
+                <span class="idx-arrow" aria-hidden="true">→</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-scroll-to="urban-samples">
+                <span class="idx-num">04</span>
+                <span class="idx-label">Samples of work</span>
+                <span class="idx-arrow" aria-hidden="true">→</span>
+              </button>
+            </li>
+          </ul>
+
+          <span class="idv__cue">Scroll</span>
+        </div>
+      </div>
+
+      <!-- ---------- Card 1 — Overview (article) ---------- -->
+      <div class="idv__content" data-stack="1" id="urban-overview">
+        <div class="wrap magazine">
+
+          <figure class="magazine__lead reveal">
+            <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=2000&q=80" alt="Urban design lead image — city skyline and street grid" loading="lazy" />
+          </figure>
+
+          <div class="magazine__intro reveal">
+            <p class="magazine__standfirst">
+              Cities are made of movement, edge conditions, and the spaces between buildings — urban design
+              is the discipline of getting those relationships right before the buildings arrive.
+            </p>
+            <p class="magazine__dropcap">
+              Urban design at MG Design Engineering works at the scale where architecture meets
+              infrastructure. We begin with how people, goods and water move through a site, then shape
+              blocks, streets, public spaces and density around that movement — so the masterplan is
+              legible long before it is built, and stays usable long after.
+            </p>
+          </div>
+
+          <aside class="magazine__pullquote reveal">
+            <p>A good masterplan is one that keeps working when the first generation of buildings is replaced.</p>
+          </aside>
+
+          <div class="magazine__columns reveal">
+            <p>
+              We work across district masterplans, transit-oriented developments, mixed-use quarters and
+              public realm strategies — from site and context analysis through to design codes, phasing
+              frameworks, and delivery guidance. Every stage is tested against viability and public
+              benefit, not just aesthetics.
+            </p>
+            <p>
+              Movement is treated as the first design move. Streets, blocks and connections are sized for
+              how people actually travel — walking, cycling, transit, service — and public space is
+              distributed where it does the most work for the most people. Density is calibrated to
+              infrastructure, daylight and the character of the surrounding context.
+            </p>
+            <p>
+              The result is urban frameworks that read clearly on a plan, work economically on a
+              spreadsheet, and feel generous at eye level — the three tests every masterplan has to pass
+              to be worth building.
+            </p>
+          </div>
+
+          <span class="stack-cue reveal">Continue — what we deliver</span>
+
+        </div>
+      </div>
+
+      <!-- ---------- Card 2 — What we deliver (viewport height) ---------- -->
+      <div class="idv__content idv__content--viewport" data-stack="2" id="urban-deliver">
+        <div class="wrap magazine">
+
+          <div class="magazine__section-head reveal">
+            <div>
+              <p class="eyebrow">Scope of work</p>
+              <h2 class="magazine__section-title">What we deliver</h2>
+            </div>
+            <span class="eyebrow">Six disciplines</span>
+          </div>
+
+          <ul class="magazine__scope-list reveal" style="border-top: none; padding-top: 0; margin-top: 0;">
+            <li>
+              <span class="scope-num">01</span>
+              <span class="scope-body">
+                <span class="scope-title">Site &amp; context analysis</span>
+                <span class="scope-copy">Movement, edge conditions, character and constraints mapped before design begins.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">02</span>
+              <span class="scope-body">
+                <span class="scope-title">Masterplanning &amp; urban framework</span>
+                <span class="scope-copy">Blocks, streets, density and mix composed into a legible, phased plan.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">03</span>
+              <span class="scope-body">
+                <span class="scope-title">Public realm &amp; landscape strategy</span>
+                <span class="scope-copy">Parks, squares and streetscapes sized for daily use and long-term care.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">04</span>
+              <span class="scope-body">
+                <span class="scope-title">Mobility &amp; connectivity</span>
+                <span class="scope-copy">Walking, cycling, transit and servicing woven into the street network.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">05</span>
+              <span class="scope-body">
+                <span class="scope-title">Density, mix &amp; viability studies</span>
+                <span class="scope-copy">Land use, massing and mix tested against yield and public benefit.</span>
+              </span>
+            </li>
+            <li>
+              <span class="scope-num">06</span>
+              <span class="scope-body">
+                <span class="scope-title">Design codes &amp; delivery frameworks</span>
+                <span class="scope-copy">Guidance that keeps the plan intact through many hands and many phases.</span>
+              </span>
+            </li>
+          </ul>
+
+          <span class="stack-cue reveal">Continue — our process</span>
+
+        </div>
+      </div>
+
+      <!-- ---------- Card 3 — Our process (viewport height, step images) ---------- -->
+      <div class="idv__content idv__content--viewport" data-stack="3" id="urban-process">
+        <div class="wrap magazine">
+
+          <div class="magazine__section-head reveal">
+            <div>
+              <p class="eyebrow">Our process</p>
+              <h2 class="magazine__section-title">Three steps, every project</h2>
+            </div>
+            <span class="eyebrow">Read · Frame · Guide</span>
+          </div>
+
+          <ol class="magazine__steps reveal" style="border-top: none; padding-top: 0; margin-top: 0;">
+            <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80" alt="Read — aerial view of the site and surrounding context" loading="lazy" />
+              </figure>
+              <span class="step-num">01</span>
+              <span class="step-title">Read</span>
+              <span class="step-copy">Site, movement, character, constraints and the people who will live there.</span>
+            </li>
+            <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1470723710355-95304d8aece4?auto=format&fit=crop&w=1200&q=80" alt="Frame — urban framework diagram and public realm strategy" loading="lazy" />
+              </figure>
+              <span class="step-num">02</span>
+              <span class="step-title">Frame</span>
+              <span class="step-copy">Blocks, streets, density, mix and public realm composed into a clear plan.</span>
+            </li>
+            <li>
+              <figure class="step-media">
+                <img src="https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=1200&q=80" alt="Guide — design codes and phasing framework for delivery" loading="lazy" />
+              </figure>
+              <span class="step-num">03</span>
+              <span class="step-title">Guide</span>
+              <span class="step-copy">Design codes, phasing and delivery frameworks that keep the plan intact.</span>
+            </li>
+          </ol>
+
+          <span class="stack-cue reveal">Continue — samples of work</span>
+
+        </div>
+      </div>
+
+      <!-- ---------- Card 4 — Samples of work (last, no pin) ---------- -->
+      <div class="idv__content" data-stack="4" id="urban-samples">
+        <div class="wrap magazine">
+
+          <div class="magazine__section-head reveal">
+            <div>
+              <p class="eyebrow">Samples of work</p>
+              <h2 class="magazine__section-title">Recent urban work</h2>
+            </div>
+            <span class="eyebrow">Placeholder imagery</span>
+          </div>
+
+          <div class="magazine__samples-grid reveal">
+            <article class="card card--lead">
+              <div class="card__img-wrap">
+                <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1600&q=80" alt="Placeholder urban project — city skyline at dusk" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Riverfront District</h3>
+                <span>Masterplan · Placeholder</span>
+              </div>
+            </article>
+
+            <article class="card card--side">
+              <div class="card__img-wrap">
+                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80" alt="Placeholder urban project — aerial view of city blocks" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>North Quarter</h3>
+                <span>Urban framework · Placeholder</span>
+              </div>
+            </article>
+
+            <article class="card card--half">
+              <div class="card__img-wrap">
+                <img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?auto=format&fit=crop&w=1400&q=80" alt="Placeholder urban project — public plaza with people" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Central Plaza</h3>
+                <span>Public realm · Placeholder</span>
+              </div>
+            </article>
+
+            <article class="card card--half">
+              <div class="card__img-wrap">
+                <img src="https://images.unsplash.com/photo-1494522855154-9297ac14b55f?auto=format&fit=crop&w=1400&q=80" alt="Placeholder urban project — transit-oriented street" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Transit Corridor</h3>
+                <span>Mobility · Placeholder</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
+            <p>To discuss an urban design project, get in touch:</p>
             <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
           </div>
 
@@ -2524,107 +2913,104 @@
   const parallaxEls = Array.from(document.querySelectorAll('[data-parallax]'));
   let ticking = false;
 
-  const idvView = document.querySelector('.view[data-view="interior-design"]');
+  /* The three flow views all use the same card-over-card stack. */
+  const idvViews = Array.from(document.querySelectorAll(
+    '.view[data-view="interior-design"], .view[data-view="architecture"], .view[data-view="urban-design"]'
+  ));
 
   function updateInteriorHero() {
     if (reduceMotion) return;
-    if (!idvView || !idvView.classList.contains('is-active')) return;
 
-    const bg    = idvView.querySelector('.idv__hero-bg');
-    const inner = idvView.querySelector('.idv__hero-inner');
-    const card  = idvView.querySelector('.idv__content');
-    if (!bg || !card) return;
+    idvViews.forEach((view) => {
+      if (!view.classList.contains('is-active')) return;
 
-    const vh = window.innerHeight || 1;
-    const rect = card.getBoundingClientRect();
-    const p = Math.min(Math.max(1 - rect.top / vh, 0), 1);
+      const bg    = view.querySelector('.idv__hero-bg');
+      const inner = view.querySelector('.idv__hero-inner');
+      const card  = view.querySelector('.idv__content');
+      if (!bg || !card) return;
 
-    bg.style.transform = `scale(${(1.06 + p * 0.09).toFixed(4)})`;
+      const vh = window.innerHeight || 1;
+      const rect = card.getBoundingClientRect();
+      const p = Math.min(Math.max(1 - rect.top / vh, 0), 1);
 
-    /* Hero image dims away as the first card rides up over it, so the
-       cards that fade above it dissolve into the hero's dark backdrop. */
-    bg.style.opacity = Math.max(0, 1 - p * 1.05).toFixed(3);
+      bg.style.transform = `scale(${(1.06 + p * 0.09).toFixed(4)})`;
+      bg.style.opacity = Math.max(0, 1 - p * 1.05).toFixed(3);
 
-    if (inner) {
-      inner.style.opacity = Math.max(0, 1 - p * 1.2).toFixed(3);
-      inner.style.transform = `translateY(${(p * -56).toFixed(1)}px)`;
-    }
+      if (inner) {
+        inner.style.opacity = Math.max(0, 1 - p * 1.2).toFixed(3);
+        inner.style.transform = `translateY(${(p * -56).toFixed(1)}px)`;
+      }
+    });
   }
 
-  /* Pin every interior card except the last one, so the following
-     card can slide up and over it. Each pinned card rests its foot
-     on the bottom of the viewport. */
   function updateStickyStack() {
-    if (!idvView) return;
-
-    const isActive = idvView.classList.contains('is-active');
-    const cards = Array.from(idvView.querySelectorAll('.idv__content'));
     const vh = window.innerHeight || 1;
 
-    cards.forEach((card, i) => {
-      const isLast = i === cards.length - 1;
+    idvViews.forEach((view) => {
+      const isActive = view.classList.contains('is-active');
+      const cards = Array.from(view.querySelectorAll('.idv__content'));
 
-      if (!isActive || isLast) {
-        card.classList.remove('is-pinned');
-        card.style.top = '';
-        return;
-      }
+      cards.forEach((card, i) => {
+        const isLast = i === cards.length - 1;
 
-      const h = card.offsetHeight;
-      if (!h) {
-        card.classList.remove('is-pinned');
-        card.style.top = '';
-        return;
-      }
+        if (!isActive || isLast) {
+          card.classList.remove('is-pinned');
+          card.style.top = '';
+          return;
+        }
 
-      card.classList.add('is-pinned');
-      const nextTop = Math.min(0, vh - h) + 'px';
-      if (card.style.top !== nextTop) card.style.top = nextTop;
+        const h = card.offsetHeight;
+        if (!h) {
+          card.classList.remove('is-pinned');
+          card.style.top = '';
+          return;
+        }
+
+        card.classList.add('is-pinned');
+        const nextTop = Math.min(0, vh - h) + 'px';
+        if (card.style.top !== nextTop) card.style.top = nextTop;
+      });
     });
   }
 
-  /* Fade each card out as the next one slides up to cover it.
-     Card 4 is last, so it never fades. */
   function updateCardFade() {
-    if (!idvView) return;
-
-    const cards = Array.from(idvView.querySelectorAll('.idv__content'));
-
-    if (reduceMotion || !idvView.classList.contains('is-active')) {
-      cards.forEach((c) => { c.style.opacity = ''; });
-      return;
-    }
-
     const vh = window.innerHeight || 1;
 
-    cards.forEach((card, i) => {
-      const next = cards[i + 1];
+    idvViews.forEach((view) => {
+      const cards = Array.from(view.querySelectorAll('.idv__content'));
 
-      if (!next) {                       /* last card never fades */
-        card.style.opacity = '';
+      if (reduceMotion || !view.classList.contains('is-active')) {
+        cards.forEach((c) => { c.style.opacity = ''; });
         return;
       }
 
-      /* 0 → next card still below the fold
-         1 → next card flush with the top of the viewport */
-      const nextTop = next.getBoundingClientRect().top;
-      const raw = 1 - nextTop / vh;
-      const p = Math.min(Math.max(raw, 0), 1);
+      cards.forEach((card, i) => {
+        const next = cards[i + 1];
 
-      /* Gentle ease so the card stays readable early, then dissolves */
-      const eased = Math.pow(p, 1.4);
-      const opacity = (1 - eased).toFixed(3);
+        if (!next) {
+          card.style.opacity = '';
+          return;
+        }
 
-      if (card.style.opacity !== opacity) card.style.opacity = opacity;
+        const nextTop = next.getBoundingClientRect().top;
+        const raw = 1 - nextTop / vh;
+        const p = Math.min(Math.max(raw, 0), 1);
+        const eased = Math.pow(p, 1.4);
+        const opacity = (1 - eased).toFixed(3);
+
+        if (card.style.opacity !== opacity) card.style.opacity = opacity;
+      });
     });
   }
 
-  if (idvView && 'ResizeObserver' in window) {
+  if ('ResizeObserver' in window) {
     const ro = new ResizeObserver(() => {
       updateStickyStack();
       updateCardFade();
     });
-    idvView.querySelectorAll('.idv__content').forEach((c) => ro.observe(c));
+    idvViews.forEach((view) => {
+      view.querySelectorAll('.idv__content').forEach((c) => ro.observe(c));
+    });
   }
   window.addEventListener('resize', updateStickyStack, { passive: true });
   window.addEventListener('resize', updateCardFade, { passive: true });
@@ -2685,7 +3071,7 @@
   updateCardFade();
 
   /* =========================================================
-     4b. INTERIOR INDEX — scroll to card
+     4b. SECTION INDEX — scroll to card
      ========================================================= */
   const indexButtons = document.querySelectorAll('.idv__index button[data-scroll-to]');
   indexButtons.forEach((btn) => {
@@ -2788,7 +3174,11 @@
     currentView = route;
     setActiveNav(route);
 
-    const isInteriorFlow = route === 'interior-design';
+    /* Interior, Architecture and Urban Design use the burger chrome. */
+    const isInteriorFlow =
+      route === 'interior-design' ||
+      route === 'architecture' ||
+      route === 'urban-design';
     document.body.classList.toggle('is-interior', isInteriorFlow);
     closeBurgerMenu();
 
@@ -2868,7 +3258,7 @@
   }
 
   /* =========================================================
-     8. BURGER MENU (Interior Design flow)
+     8. BURGER MENU (Interior Design + Architecture + Urban Design flow)
      ========================================================= */
   const burgerBtn = document.getElementById('burgerFab');
   const burgerMenu = document.getElementById('burgerMenu');
