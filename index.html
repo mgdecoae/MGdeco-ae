@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#f4f1ec" />
 <title>MG Design Engineering — Architecture, Design & Strategy</title>
+<!-- Speed up CDN image delivery -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 <style>
   /* ---------- Design tokens ---------- */
   :root {
@@ -1088,7 +1091,8 @@
     margin-left: calc(-1 * clamp(130px, 18vw, 200px));
     border-radius: 4px;
     overflow: hidden;
-    background: #e6e1d8;
+    /* Placeholder gradient so there's a visible base while loading */
+    background: linear-gradient(135deg, #e6e1d8 0%, #d9d3ca 100%);
     box-shadow: 0 12px 30px -12px rgba(20, 17, 15, 0.4);
     transition: transform 0.6s var(--ease-out),
                 opacity 0.6s var(--ease-out),
@@ -2090,7 +2094,7 @@
   </nav>
 
   <div class="burger-menu__foot">
-    <a href="mailto:enquiries@mgdeco.ae">enquiries@mgdeco.ae</a>
+    <a href="mailto:enquiry@mgdeco.ae">enquiry@mgdeco.ae</a>
     <span>Architecture · Interior Design · Urban Solution Strategy</span>
   </div>
 </div>
@@ -2259,7 +2263,7 @@
 
     <div class="wrap view-body" style="padding-top: 0; padding-bottom: clamp(3rem, 6vw, 5rem); max-width: 62ch;">
       <p>Not sure which service fits your brief? Start with a conversation.</p>
-      <p><a href="mailto:enquiries@mgdeco.ae" class="btn">enquiries@mgdeco.ae <span class="arrow">→</span></a></p>
+      <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
     </div>
   </section>
 
@@ -2474,7 +2478,7 @@
               <p class="eyebrow">Samples of work</p>
               <h2 class="magazine__section-title">Recent interior work</h2>
             </div>
-            <span class="eyebrow">Placeholder imagery</span>
+            <span class="eyebrow">Joud Coffee</span>
           </div>
 
           <div class="coverflow-section reveal">
@@ -2494,7 +2498,7 @@
 
           <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
             <p>To discuss an interior project, get in touch:</p>
-            <p><a href="mailto:enquiries@mgdeco.ae" class="btn">enquiries@mgdeco.ae <span class="arrow">→</span></a></p>
+            <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
           </div>
 
         </div>
@@ -2760,7 +2764,7 @@
 
           <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
             <p>To discuss an architecture project, get in touch:</p>
-            <p><a href="mailto:enquiries@mgdeco.ae" class="btn">enquiries@mgdeco.ae <span class="arrow">→</span></a></p>
+            <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
           </div>
 
         </div>
@@ -3030,7 +3034,7 @@
 
           <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
             <p>To discuss an urban design project, get in touch:</p>
-            <p><a href="mailto:enquiries@mgdeco.ae" class="btn">enquiries@mgdeco.ae <span class="arrow">→</span></a></p>
+            <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
           </div>
 
         </div>
@@ -3095,7 +3099,7 @@
     </div>
     <div class="wrap view-body">
       <p>Tell us about your site, your brief, or the question you're trying to answer. We'll respond within two working days.</p>
-      <p><a href="mailto:enquiries@mgdeco.ae" class="btn">enquiries@mgdeco.ae <span class="arrow">→</span></a></p>
+      <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
     </div>
   </section>
 
@@ -3122,7 +3126,7 @@
       <div>
         <h4>Contact</h4>
         <ul>
-          <li><a href="mailto:enquiries@mgdeco.ae">enquiries@mgdeco.ae</a></li>
+          <li><a href="mailto:enquiry@mgdeco.ae">enquiry@mgdeco.ae</a></li>
           <li><a href="#">LinkedIn</a></li>
           <li><a href="#">Instagram</a></li>
         </ul>
@@ -3575,6 +3579,11 @@
     closeBurgerMenu();
     closeNavMenu();
 
+    /* If the user navigates straight to interior-design, warm the carousel cache now */
+    if (route === 'interior-design' && typeof preloadCarouselImages === 'function') {
+      preloadCarouselImages();
+    }
+
     const heading = next.querySelector('h1, .display');
     if (heading) {
       heading.setAttribute('tabindex', '-1');
@@ -3722,8 +3731,54 @@
   });
 
   /* =========================================================
-     9. COVER FLOW CAROUSEL — INTERIOR DESIGN SAMPLES (RECTANGULAR, AUTO-EXPAND)
+     9. COVER FLOW CAROUSEL — INTERIOR DESIGN SAMPLES
+        (Joud Coffee project images)
+        + Preload & cache-warming for fast CDN delivery
      ========================================================= */
+  const carouselSources = [
+    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp',
+    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp',
+    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp',
+    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp',
+    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp',
+    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp'
+  ];
+
+  /* --- Preload helpers (hoisted so the router can call them) --- */
+  function preloadCarouselImages() {
+    // Use <link rel="preload"> for the first two images so they start
+    // downloading as early as possible, with the correct priority.
+    carouselSources.slice(0, 2).forEach((src, i) => {
+      if (document.querySelector(`link[data-carousel-preload="${i}"]`)) return;
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = src;
+      link.dataset.carouselPreload = String(i);
+      if (i === 0) link.fetchPriority = 'high';
+      document.head.appendChild(link);
+    });
+  }
+
+  function warmCarouselCache() {
+    // Fetch remaining images at idle time to fill the HTTP cache
+    // without competing with the hero / above-the-fold resources.
+    carouselSources.forEach((src, i) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.loading = 'eager';
+      if (i === 0) img.fetchPriority = 'low';
+      img.src = src;
+    });
+  }
+
+  // Kick off background cache warming once the page is idle.
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(warmCarouselCache, { timeout: 4000 });
+  } else {
+    setTimeout(warmCarouselCache, 2500);
+  }
+
   (function initCoverFlow() {
     const stage = document.getElementById('cfStage');
     const track = document.getElementById('cfTrack');
@@ -3732,34 +3787,12 @@
     const dotsContainer = document.getElementById('cfDots');
     if (!stage || !track) return;
 
-    /* --- project data with rectangular images --- */
-    const projects = [
-      {
-        src: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&h=800&q=80',
-        title: 'Sample Project 01',
-        meta: 'Interiors · Placeholder'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&h=800&q=80',
-        title: 'Sample Project 02',
-        meta: 'Interiors · Placeholder'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&h=800&q=80',
-        title: 'Sample Project 03',
-        meta: 'Interiors · Placeholder'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&h=800&q=80',
-        title: 'Sample Project 04',
-        meta: 'Interiors · Placeholder'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&h=800&q=80',
-        title: 'Sample Project 05',
-        meta: 'Interiors · Placeholder'
-      }
-    ];
+    /* --- Joud Coffee project images --- */
+    const projects = carouselSources.map((src) => ({
+      src,
+      title: 'Joud Coffee',
+      meta: 'Interiors · 2023'
+    }));
 
     let currentIndex = 0;
     const total = projects.length;
@@ -3775,7 +3808,11 @@
       const img = document.createElement('img');
       img.src = p.src;
       img.alt = p.title + ' — interior design project';
-      img.loading = 'lazy';
+      // Eager-load the first few so the visible slides render fast;
+      // lazy-load the rest.
+      img.loading = i < 3 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      if (i === 0) img.fetchPriority = 'high';
       item.appendChild(img);
 
       const meta = document.createElement('div');
