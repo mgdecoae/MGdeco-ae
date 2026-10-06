@@ -99,39 +99,103 @@
     cursor: pointer;
   }
 
+  /* ---------- Nav dropdown (legacy — kept hidden; overlay menu is used instead) ---------- */
   .nav ul {
     display: flex;
-    gap: 2rem;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 24px 40px -20px rgba(20, 17, 15, 0.18);
     list-style: none;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    z-index: 49;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition:
+      opacity 0.4s var(--ease-out),
+      visibility 0.4s var(--ease-out),
+      transform 0.4s var(--ease-out);
   }
 
-  .nav ul a { position: relative; padding-bottom: 2px; cursor: pointer; }
-  .nav ul a::after {
-    content: "";
-    position: absolute;
-    left: 0; bottom: 0;
-    width: 0; height: 1px;
-    background: var(--ink);
-    transition: width 0.4s var(--ease);
+  .nav.is-open ul {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
   }
-  .nav ul a:hover::after,
-  .nav ul a.is-active::after { width: 100%; }
+
+  .nav ul li {
+    border-bottom: 1px solid var(--line);
+  }
+  .nav ul li:last-child { border-bottom: none; }
+
+  .nav ul a {
+    display: block;
+    padding: 1.1rem var(--gutter);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    color: var(--ink);
+    transition: color 0.3s var(--ease), background 0.3s var(--ease), padding-left 0.3s var(--ease);
+    position: static;
+  }
+  .nav ul a::after { display: none; }
+  .nav ul a:hover,
+  .nav ul a:focus-visible {
+    color: var(--accent);
+    background: rgba(20, 17, 15, 0.03);
+    padding-left: calc(var(--gutter) + 0.35rem);
+    outline: none;
+  }
   .nav ul a.is-active { color: var(--accent); }
 
-  .menu-toggle { display: none; }
-
-  @media (max-width: 760px) {
-    .nav ul { display: none; }
-    .menu-toggle {
-      display: block;
-      background: none;
-      border: 1px solid var(--ink);
-      padding: 0.4rem 0.8rem;
-      font: inherit;
-      cursor: pointer;
-    }
+  /* ---------- Hamburger toggle (all viewports) ---------- */
+  .menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+    font: inherit;
+    color: inherit;
   }
+  .menu-toggle:hover {
+    border-color: var(--ink);
+    background: rgba(20, 17, 15, 0.03);
+  }
+  .menu-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .menu-toggle span {
+    display: block;
+    width: 16px;
+    height: 1.5px;
+    background: var(--ink);
+    border-radius: 1px;
+    transition: transform 0.35s var(--ease), opacity 0.25s var(--ease);
+  }
+  .menu-toggle.is-open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .menu-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .menu-toggle.is-open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
 
   main {
     padding-top: var(--header-h);
@@ -776,7 +840,7 @@
     align-items: baseline;
   }
   .magazine__pullquote::before {
-    content: "“";
+    content: """;
     font-family: Georgia, serif;
     font-size: clamp(3.5rem, 7vw, 6rem);
     line-height: 0.7;
@@ -982,6 +1046,200 @@
     .magazine__samples-grid .card--half { grid-column: span 12; }
   }
 
+  /* ---------- COVER FLOW CAROUSEL (Interior Samples) — RECTANGULAR ---------- */
+  .coverflow-section {
+    margin-top: clamp(2rem, 5vw, 3rem);
+  }
+  .coverflow {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+    user-select: none;
+    transition: max-width 0.8s var(--ease-out);
+  }
+  .coverflow__stage {
+    position: relative;
+    width: 100%;
+    height: clamp(220px, 30vw, 300px);
+    perspective: 1200px;
+    overflow: visible;
+    cursor: grab;
+    touch-action: pan-y;
+    transition: height 0.8s var(--ease-out);
+  }
+  .coverflow__stage:active {
+    cursor: grabbing;
+  }
+  .coverflow__track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .coverflow__item {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: clamp(260px, 36vw, 400px);
+    height: 100%;
+    margin-left: calc(-1 * clamp(130px, 18vw, 200px));
+    border-radius: 4px;
+    overflow: hidden;
+    background: #e6e1d8;
+    box-shadow: 0 12px 30px -12px rgba(20, 17, 15, 0.4);
+    transition: transform 0.6s var(--ease-out),
+                opacity 0.6s var(--ease-out),
+                box-shadow 0.6s var(--ease-out),
+                width 0.8s var(--ease-out),
+                margin-left 0.8s var(--ease-out);
+    will-change: transform, opacity;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .coverflow__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+  .coverflow__item .card__meta {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    transform: none;
+    opacity: 1;
+    transition: none;
+    z-index: 3;
+  }
+  .coverflow__item .card__meta h3 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+  }
+  .coverflow__item .card__meta span {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    transform: none;
+  }
+  .coverflow__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: clamp(1.25rem, 3vw, 2rem);
+  }
+  .coverflow__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--ink);
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease);
+    font-family: inherit;
+  }
+  .coverflow__btn:hover {
+    border-color: var(--ink);
+    background: rgba(20, 17, 15, 0.04);
+  }
+  .coverflow__dots {
+    display: flex;
+    gap: 0.6rem;
+  }
+  .coverflow__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .coverflow__dot.is-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.25);
+  }
+  .coverflow__dot:hover {
+    border-color: var(--ink);
+  }
+
+  @media (max-width: 760px) {
+    .coverflow__stage {
+      height: clamp(160px, 42vw, 220px);
+      perspective: 800px;
+    }
+    .coverflow__item {
+      width: clamp(180px, 52vw, 280px);
+      margin-left: calc(-1 * clamp(90px, 26vw, 140px));
+    }
+    .coverflow__item .card__meta {
+      padding: 0.75rem 0.9rem;
+    }
+    .coverflow__item .card__meta h3 {
+      font-size: 0.85rem;
+    }
+    .coverflow__item .card__meta span {
+      font-size: 0.6rem;
+    }
+    .coverflow__controls {
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .coverflow__btn {
+      width: 38px;
+      height: 38px;
+      font-size: 0.95rem;
+    }
+    .coverflow__dots {
+      gap: 0.4rem;
+    }
+    .coverflow__dot {
+      width: 6px;
+      height: 6px;
+    }
+  }
+
+  /* Auto-expanded state when the samples section is reached */
+  .coverflow.is-expanded {
+    max-width: 1200px;
+  }
+  .coverflow.is-expanded .coverflow__stage {
+    height: clamp(320px, 44vw, 460px);
+  }
+  .coverflow.is-expanded .coverflow__item {
+    width: clamp(360px, 52vw, 560px);
+    margin-left: calc(-1 * clamp(180px, 26vw, 280px));
+  }
+
+  @media (max-width: 760px) {
+    .coverflow.is-expanded .coverflow__stage {
+      height: clamp(240px, 60vw, 320px);
+    }
+    .coverflow.is-expanded .coverflow__item {
+      width: clamp(240px, 68vw, 360px);
+      margin-left: calc(-1 * clamp(120px, 34vw, 180px));
+    }
+  }
+  /* --- end coverflow --- */
+
+  /* ---------- Back button (no border) ---------- */
   .back-btn {
     display: inline-flex;
     align-items: center;
@@ -989,7 +1247,7 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    border-bottom: 1px solid var(--ink);
+    border: none;
     padding-bottom: 0.35rem;
     cursor: pointer;
     background: none;
@@ -997,7 +1255,10 @@
     color: inherit;
     transition: gap 0.3s var(--ease), color 0.3s var(--ease);
   }
-  .back-btn:hover { gap: 0.9rem; color: var(--accent); border-color: var(--accent); }
+  .back-btn:hover {
+    gap: 0.9rem;
+    color: var(--accent);
+  }
 
   /* ---------- Interior Design + Architecture + Urban Design flows ---------- */
   body.is-interior #siteHeader { display: none; }
@@ -1076,38 +1337,162 @@
   }
   body.is-interior .interior-logo { display: block; }
 
+  /* =========================================================
+     FULL-SCREEN OVERLAY MENU
+     (used by the site header AND the Interior/Architecture/Urban chrome)
+     ========================================================= */
   .burger-menu {
     position: fixed;
     inset: 0;
     z-index: 65;
     background: var(--paper);
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: center;
+    padding: calc(var(--header-h) + clamp(1rem, 3vw, 2rem)) var(--gutter) clamp(1.5rem, 4vw, 2.5rem);
     opacity: 0;
     visibility: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     transition: opacity 0.45s var(--ease-out), visibility 0.45s var(--ease-out);
   }
   .burger-menu.is-open { opacity: 1; visibility: visible; }
 
-  .burger-menu ul {
-    list-style: none;
-    display: grid;
-    gap: clamp(0.75rem, 2vw, 1.25rem);
-    text-align: center;
+  .burger-menu__nav {
+    width: 100%;
+    max-width: var(--max);
+    margin-inline: auto;
   }
 
-  .burger-menu a {
+  .burger-menu__nav ul {
+    list-style: none;
+    display: grid;
+    gap: 0;
+    text-align: left;
+    border-top: 1px solid var(--line);
+  }
+
+  .burger-menu__nav li {
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .burger-menu__nav a {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    padding-block: clamp(0.5rem, 1.4vw, 0.9rem);
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 400;
-    font-size: clamp(1.75rem, 5vw, 3rem);
+    font-size: clamp(1.65rem, 5vw, 3rem);
     line-height: 1.15;
     letter-spacing: -0.02em;
     color: var(--ink);
-    transition: color 0.3s var(--ease);
+    opacity: 0;
+    transform: translateY(115%);
+    transition:
+      opacity 0.55s var(--ease-out),
+      transform 0.68s var(--ease-out),
+      color 0.3s var(--ease),
+      padding-left 0.35s var(--ease-out);
   }
-  .burger-menu a:hover,
-  .burger-menu a:focus-visible { color: var(--accent); outline: none; }
+
+  .burger-menu.is-open .burger-menu__nav a {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: calc(var(--i, 0) * 55ms + 80ms);
+  }
+
+  .burger-menu .bm-num {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    flex: 0 0 auto;
+    min-width: 2rem;
+    transform: translateY(-0.35em);
+  }
+
+  .burger-menu .bm-label { display: block; }
+
+  .burger-menu__nav a:hover,
+  .burger-menu__nav a:focus-visible {
+    color: var(--accent);
+    padding-left: 0.6rem;
+    outline: none;
+  }
+
+  .burger-menu__foot {
+    width: 100%;
+    max-width: var(--max);
+    margin-inline: auto;
+    margin-top: clamp(1.5rem, 4vw, 3rem);
+    padding-top: clamp(1rem, 2.5vw, 1.5rem);
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  }
+  .burger-menu.is-open .burger-menu__foot {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.42s;
+  }
+  .burger-menu__foot a { color: var(--ink); }
+  .burger-menu__foot a:hover { color: var(--accent); }
+
+  /* Close button inside the overlay — hidden in the flow chrome (which keeps its FAB) */
+  .overlay-close {
+    position: fixed;
+    top: calc((var(--header-h) - 44px) / 2);
+    right: var(--gutter);
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .overlay-close:hover {
+    border-color: var(--ink);
+    background: rgba(20, 17, 15, 0.03);
+  }
+  .overlay-close:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .overlay-close span {
+    display: block;
+    width: 16px;
+    height: 1.5px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+  .overlay-close span:nth-child(1) { transform: translateY(2.75px) rotate(45deg); }
+  .overlay-close span:nth-child(2) { transform: translateY(-2.75px) rotate(-45deg); }
+
+  body.is-interior .overlay-close { display: none; }
 
   /* =========================================================
      INTERIOR DESIGN + ARCHITECTURE + URBAN DESIGN — CARD STACK
@@ -1391,9 +1776,13 @@
     .services li a:hover .arrow { opacity: 0; transform: translateX(-6px); }
     .btn:hover { gap: 0.6rem; color: inherit; border-color: var(--ink); }
     .btn:hover .arrow { transform: none; }
-    .back-btn:hover { gap: 0.5rem; color: inherit; border-color: var(--ink); }
+    .back-btn:hover { gap: 0.5rem; color: inherit; }
     .idv__index button:hover { color: inherit; padding-left: 0; }
     .idv__index button:hover .idx-arrow { opacity: 0; transform: translateX(-6px); }
+    .nav ul a:hover { color: var(--ink); background: transparent; padding-left: var(--gutter); }
+    .menu-toggle:hover { border-color: var(--line); background: transparent; }
+    .burger-menu__nav a:hover { color: var(--ink); padding-left: 0; }
+    .overlay-close:hover { border-color: var(--line); background: transparent; }
   }
 
   @media (max-width: 760px) {
@@ -1403,10 +1792,10 @@
 
     .nav { padding-block: 0.85rem; }
     .logo { font-size: 1.05rem; }
-    .menu-toggle {
-      min-height: 40px;
-      padding: 0.5rem 0.9rem;
-      border-radius: 6px;
+
+    .nav ul a {
+      padding: 0.95rem var(--gutter);
+      font-size: 1.15rem;
     }
 
     .hero {
@@ -1564,8 +1953,23 @@
       max-width: calc(100vw - 2 * var(--gutter) - 64px);
     }
 
-    .burger-menu ul { padding-inline: var(--gutter); gap: 0.75rem; }
-    .burger-menu a { font-size: clamp(1.5rem, 6vw, 2.25rem); }
+    /* Full-screen overlay menu — mobile tuning */
+    .burger-menu {
+      padding-top: calc(var(--header-h) + 1.25rem);
+      padding-bottom: 1.75rem;
+    }
+    .burger-menu__nav a {
+      font-size: clamp(1.5rem, 7vw, 2.25rem);
+      padding-block: 0.6rem;
+      gap: 0.85rem;
+    }
+    .burger-menu .bm-num { font-size: 0.66rem; min-width: 1.75rem; }
+    .burger-menu__foot {
+      font-size: 0.64rem;
+      letter-spacing: 0.14em;
+      margin-top: 1.5rem;
+    }
+    .overlay-close { width: 44px; height: 44px; }
   }
 
   @media (max-width: 400px) {
@@ -1591,6 +1995,7 @@
       min-height: auto;
       padding-block: 2.5rem;
     }
+    .burger-menu { justify-content: flex-start; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1617,6 +2022,9 @@
     ::view-transition-old(root),
     ::view-transition-new(root) { animation: none; }
     .burger-menu { transition: none; }
+    .burger-menu__nav a { opacity: 1; transform: none; }
+    .burger-menu__foot { opacity: 1; transform: none; }
+    .nav ul { transition: none; }
 
     .idv__hero-bg { transform: none !important; opacity: 1 !important; }
     .idv__hero-inner { opacity: 1 !important; transform: none !important; }
@@ -1631,10 +2039,10 @@
 <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
 <header id="siteHeader">
-  <div class="wrap nav">
+  <div class="wrap nav" id="primaryNavWrap">
     <a href="#" class="logo" data-route="home">MG Design Engineering Company</a>
     <nav aria-label="Primary">
-      <ul>
+      <ul id="primaryNav">
         <li><a href="#Services" data-route="Services">Services</a></li>
         <li><a href="#work" data-route="work">Work</a></li>
         <li><a href="#studio" data-route="studio">Studio</a></li>
@@ -1642,7 +2050,12 @@
         <li><a href="#contact" data-route="contact">Contact</a></li>
       </ul>
     </nav>
-    <button class="menu-toggle" aria-label="Open menu">Menu</button>
+    <button class="menu-toggle" type="button"
+            aria-label="Open menu" aria-expanded="false" aria-controls="burgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </header>
 
@@ -1658,17 +2071,28 @@
 
 <a href="#" class="interior-logo" data-route="home">MG Design Engineering Company</a>
 
+<!-- ============ FULL-SCREEN OVERLAY MENU ============ -->
 <div class="burger-menu" id="burgerMenu" aria-hidden="true">
-  <nav aria-label="Section menu">
+  <button class="overlay-close" id="overlayClose" type="button" aria-label="Close menu">
+    <span></span>
+    <span></span>
+  </button>
+
+  <nav class="burger-menu__nav" aria-label="Section menu">
     <ul>
-      <li><a href="#" data-route="home">Home</a></li>
-      <li><a href="#" data-route="Services">Services</a></li>
-      <li><a href="#" data-route="work">Work</a></li>
-      <li><a href="#" data-route="studio">Studio</a></li>
-      <li><a href="#" data-route="insights">Insights</a></li>
-      <li><a href="#" data-route="contact">Contact</a></li>
+      <li><a href="#" data-route="home" style="--i:0"><span class="bm-num">01</span><span class="bm-label">Home</span></a></li>
+      <li><a href="#" data-route="Services" style="--i:1"><span class="bm-num">02</span><span class="bm-label">Services</span></a></li>
+      <li><a href="#" data-route="work" style="--i:2"><span class="bm-num">03</span><span class="bm-label">Work</span></a></li>
+      <li><a href="#" data-route="studio" style="--i:3"><span class="bm-num">04</span><span class="bm-label">Studio</span></a></li>
+      <li><a href="#" data-route="insights" style="--i:4"><span class="bm-num">05</span><span class="bm-label">Insights</span></a></li>
+      <li><a href="#" data-route="contact" style="--i:5"><span class="bm-num">06</span><span class="bm-label">Contact</span></a></li>
     </ul>
   </nav>
+
+  <div class="burger-menu__foot">
+    <a href="mailto:enquiry@mgdeco.ae">enquiry@mgdeco.ae</a>
+    <span>Architecture · Interior Design · Urban Solution Strategy</span>
+  </div>
 </div>
 
 <main id="main">
@@ -2041,6 +2465,7 @@
         </div>
       </div>
 
+      <!-- ---------- CARD 4 — SAMPLES OF WORK (Cover Flow Carousel) ---------- -->
       <div class="idv__content" data-stack="4" id="idv-samples">
         <div class="wrap magazine">
 
@@ -2052,46 +2477,19 @@
             <span class="eyebrow">Placeholder imagery</span>
           </div>
 
-          <div class="magazine__samples-grid reveal">
-            <article class="card card--lead">
-              <div class="card__img-wrap">
-                <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1600&q=80" alt="Placeholder interior project — living space" loading="lazy" />
+          <div class="coverflow-section reveal">
+            <div class="coverflow" id="coverflowInterior">
+              <div class="coverflow__stage" id="cfStage" role="region" aria-label="Interior design project carousel">
+                <div class="coverflow__track" id="cfTrack">
+                  <!-- Items will be injected by JS -->
+                </div>
               </div>
-              <div class="card__meta">
-                <h3>Sample Project 01</h3>
-                <span>Interiors · Placeholder</span>
+              <div class="coverflow__controls">
+                <button class="coverflow__btn" id="cfPrev" aria-label="Previous project">←</button>
+                <div class="coverflow__dots" id="cfDots" role="tablist" aria-label="Project navigation"></div>
+                <button class="coverflow__btn" id="cfNext" aria-label="Next project">→</button>
               </div>
-            </article>
-
-            <article class="card card--side">
-              <div class="card__img-wrap">
-                <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80" alt="Placeholder interior project — detail" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Sample Project 02</h3>
-                <span>Interiors · Placeholder</span>
-              </div>
-            </article>
-
-            <article class="card card--half">
-              <div class="card__img-wrap">
-                <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=80" alt="Placeholder interior project — workspace" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Sample Project 03</h3>
-                <span>Interiors · Placeholder</span>
-              </div>
-            </article>
-
-            <article class="card card--half">
-              <div class="card__img-wrap">
-                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80" alt="Placeholder interior project — hospitality" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Sample Project 04</h3>
-                <span>Interiors · Placeholder</span>
-              </div>
-            </article>
+            </div>
           </div>
 
           <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
@@ -2371,13 +2769,7 @@
     </div>
   </section>
 
-  <!-- ============ URBAN DESIGN VIEW ============
-       Same card-over-card structure as Interior Design and Architecture:
-         1. Overview (article)
-         2. What we deliver (viewport height)
-         3. Our process (viewport height, with step images)
-         4. Samples of work
-       Hero carries an index list that scrolls to each card. -->
+  <!-- ============ URBAN DESIGN VIEW ============ -->
   <section class="view" data-view="urban-design" aria-label="Urban Design">
     <div class="idv">
 
@@ -3181,6 +3573,7 @@
       route === 'urban-design';
     document.body.classList.toggle('is-interior', isInteriorFlow);
     closeBurgerMenu();
+    closeNavMenu();
 
     const heading = next.querySelector('h1, .display');
     if (heading) {
@@ -3237,58 +3630,308 @@
   }
 
   /* =========================================================
-     7. MOBILE MENU (basic)
+     7. HEADER MENU TOGGLE → FULL-SCREEN OVERLAY MENU
      ========================================================= */
-  const toggle = document.querySelector('.menu-toggle');
-  const navUl = document.querySelector('.nav ul');
-  if (toggle && navUl) {
-    toggle.addEventListener('click', () => {
-      const open = navUl.style.display === 'flex';
-      navUl.style.display = open ? 'none' : 'flex';
-      Object.assign(navUl.style, {
-        position: 'absolute',
-        top: '100%', left: '0', right: '0',
-        flexDirection: 'column',
-        gap: '1rem',
-        padding: '1.5rem',
-        background: 'var(--paper)',
-        borderBottom: '1px solid var(--line)'
-      });
+  const navToggle = document.querySelector('.menu-toggle');
+  const navWrap   = document.getElementById('primaryNavWrap');
+
+  function closeNavMenu() {
+    if (navWrap) navWrap.classList.remove('is-open');
+    if (!navToggle) return;
+    navToggle.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    navToggle.setAttribute('aria-label', 'Open menu');
+  }
+
+  if (navToggle) {
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (burgerMenu && burgerMenu.classList.contains('is-open')) {
+        closeBurgerMenu();
+      } else {
+        openBurgerMenu();
+      }
     });
   }
 
   /* =========================================================
-     8. BURGER MENU (Interior Design + Architecture + Urban Design flow)
+     8. FULL-SCREEN OVERLAY MENU
+        (site header on all main views + Interior/Architecture/Urban chrome)
      ========================================================= */
   const burgerBtn = document.getElementById('burgerFab');
   const burgerMenu = document.getElementById('burgerMenu');
+  const overlayClose = document.getElementById('overlayClose');
+
+  function openBurgerMenu() {
+    if (!burgerMenu) return;
+
+    burgerMenu.classList.add('is-open');
+    burgerMenu.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    if (burgerBtn) {
+      burgerBtn.classList.add('is-open');
+      burgerBtn.setAttribute('aria-expanded', 'true');
+      burgerBtn.setAttribute('aria-label', 'Close menu');
+    }
+    if (navToggle) {
+      navToggle.classList.add('is-open');
+      navToggle.setAttribute('aria-expanded', 'true');
+      navToggle.setAttribute('aria-label', 'Close menu');
+    }
+    if (overlayClose && !document.body.classList.contains('is-interior')) {
+      overlayClose.focus({ preventScroll: true });
+    }
+  }
 
   function closeBurgerMenu() {
-    if (!burgerBtn || !burgerMenu) return;
-    burgerBtn.classList.remove('is-open');
+    if (!burgerMenu) return;
+
     burgerMenu.classList.remove('is-open');
-    burgerBtn.setAttribute('aria-expanded', 'false');
-    burgerBtn.setAttribute('aria-label', 'Open menu');
     burgerMenu.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+
+    if (burgerBtn) {
+      burgerBtn.classList.remove('is-open');
+      burgerBtn.setAttribute('aria-expanded', 'false');
+      burgerBtn.setAttribute('aria-label', 'Open menu');
+    }
+    if (navToggle) {
+      navToggle.classList.remove('is-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+      navToggle.setAttribute('aria-label', 'Open menu');
+    }
   }
 
-  if (burgerBtn && burgerMenu) {
+  if (burgerBtn) {
     burgerBtn.addEventListener('click', () => {
-      const open = !burgerMenu.classList.contains('is-open');
-
-      burgerBtn.classList.toggle('is-open', open);
-      burgerMenu.classList.toggle('is-open', open);
-      burgerBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      burgerBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-      burgerMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
-      document.body.style.overflow = open ? 'hidden' : '';
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeBurgerMenu();
+      if (burgerMenu && burgerMenu.classList.contains('is-open')) closeBurgerMenu();
+      else openBurgerMenu();
     });
   }
+
+  if (overlayClose) {
+    overlayClose.addEventListener('click', closeBurgerMenu);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeBurgerMenu();
+      closeNavMenu();
+    }
+  });
+
+  /* =========================================================
+     9. COVER FLOW CAROUSEL — INTERIOR DESIGN SAMPLES (RECTANGULAR, AUTO-EXPAND)
+     ========================================================= */
+  (function initCoverFlow() {
+    const stage = document.getElementById('cfStage');
+    const track = document.getElementById('cfTrack');
+    const prevBtn = document.getElementById('cfPrev');
+    const nextBtn = document.getElementById('cfNext');
+    const dotsContainer = document.getElementById('cfDots');
+    if (!stage || !track) return;
+
+    /* --- project data with rectangular images --- */
+    const projects = [
+      {
+        src: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&h=800&q=80',
+        title: 'Sample Project 01',
+        meta: 'Interiors · Placeholder'
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&h=800&q=80',
+        title: 'Sample Project 02',
+        meta: 'Interiors · Placeholder'
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&h=800&q=80',
+        title: 'Sample Project 03',
+        meta: 'Interiors · Placeholder'
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&h=800&q=80',
+        title: 'Sample Project 04',
+        meta: 'Interiors · Placeholder'
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&h=800&q=80',
+        title: 'Sample Project 05',
+        meta: 'Interiors · Placeholder'
+      }
+    ];
+
+    let currentIndex = 0;
+    const total = projects.length;
+    let items = [];
+    let dots = [];
+
+    /* --- build items --- */
+    projects.forEach((p, i) => {
+      const item = document.createElement('div');
+      item.className = 'coverflow__item';
+      item.dataset.index = i;
+
+      const img = document.createElement('img');
+      img.src = p.src;
+      img.alt = p.title + ' — interior design project';
+      img.loading = 'lazy';
+      item.appendChild(img);
+
+      const meta = document.createElement('div');
+      meta.className = 'card__meta';
+      meta.innerHTML = `<h3>${p.title}</h3><span>${p.meta}</span>`;
+      item.appendChild(meta);
+
+      track.appendChild(item);
+      items.push(item);
+    });
+
+    /* --- build dots --- */
+    if (dotsContainer) {
+      projects.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'coverflow__dot' + (i === 0 ? ' is-active' : '');
+        dot.type = 'button';
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `Go to project ${i + 1}`);
+        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+        dot.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(dot);
+        dots.push(dot);
+      });
+    }
+
+    /* --- positioning --- */
+    function layout() {
+      const stageWidth = stage.offsetWidth;
+      const itemWidth = items[0] ? items[0].offsetWidth : 200;
+      const gap = Math.min(stageWidth * 0.06, 60);
+      const current = currentIndex;
+      const range = 3;
+
+      items.forEach((item, i) => {
+        const diff = i - current;
+        const absDiff = Math.abs(diff);
+
+        if (absDiff > range) {
+          item.style.opacity = '0';
+          item.style.pointerEvents = 'none';
+          item.style.transform = `translateX(${diff * (itemWidth + gap) * 0.4}px) scale(0.4)`;
+          return;
+        }
+
+        const translateX = diff * (itemWidth * 0.55 + gap);
+        const rotateY = diff * -14;
+        const scale = 1 - absDiff * 0.14;
+        const zIndex = 10 - absDiff;
+        const opacity = 1 - absDiff * 0.18;
+
+        item.style.transform =
+          `translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`;
+        item.style.zIndex = zIndex;
+        item.style.opacity = opacity;
+        item.style.pointerEvents = absDiff <= 1 ? 'auto' : 'none';
+
+        item.classList.toggle('is-active', i === current);
+      });
+    }
+
+    function goTo(index) {
+      if (index < 0) index = total - 1;
+      if (index >= total) index = 0;
+      currentIndex = index;
+
+      layout();
+
+      dots.forEach((d, i) => {
+        d.classList.toggle('is-active', i === currentIndex);
+        d.setAttribute('aria-selected', i === currentIndex ? 'true' : 'false');
+      });
+    }
+
+    /* --- controls --- */
+    if (prevBtn) prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+
+    /* --- keyboard --- */
+    stage.setAttribute('tabindex', '0');
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(currentIndex - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); goTo(currentIndex + 1); }
+    });
+
+    /* --- swipe / drag --- */
+    let startX = 0;
+    let isDragging = false;
+    let moved = false;
+
+    stage.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      moved = false;
+      startX = e.clientX;
+      stage.setPointerCapture(e.pointerId);
+      stage.style.cursor = 'grabbing';
+    });
+
+    stage.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 8) moved = true;
+    });
+
+    stage.addEventListener('pointerup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      stage.style.cursor = '';
+      const dx = e.clientX - startX;
+      if (!moved) return;
+      if (dx < -30) goTo(currentIndex + 1);
+      else if (dx > 30) goTo(currentIndex - 1);
+    });
+
+    stage.addEventListener('pointercancel', () => {
+      isDragging = false;
+      stage.style.cursor = '';
+    });
+
+    /* --- resize --- */
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(layout, 100);
+    });
+
+    /* --- initial layout after images load --- */
+    if (document.readyState === 'complete') {
+      layout();
+    } else {
+      window.addEventListener('load', layout);
+    }
+    /* also run once immediately for instant feedback */
+    requestAnimationFrame(layout);
+
+    /* --- auto-expand when the carousel lands in view --- */
+    const coverflow = document.getElementById('coverflowInterior');
+    if (coverflow) {
+      const expandObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              coverflow.classList.add('is-expanded');
+              /* re-layout once the expansion transition begins, and once it ends */
+              requestAnimationFrame(layout);
+              setTimeout(layout, 820);
+              expandObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.35, rootMargin: '0px 0px -80px 0px' }
+      );
+      expandObserver.observe(coverflow);
+    }
+  })();
+
 })();
 </script>
 
