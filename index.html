@@ -1049,6 +1049,320 @@
     .magazine__samples-grid .card--half { grid-column: span 12; }
   }
 
+  /* =========================================================
+     SELECTED WORK — FULLSCREEN BACKGROUND PROJECT SLIDESHOW
+     ========================================================= */
+  .fullscreen-projects {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #1a1816;
+    color: #fff;
+  }
+
+  .fullscreen-projects__bg-stack {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .fullscreen-projects__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity;
+    z-index: 0;
+  }
+
+  .fullscreen-projects__slide.is-active {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .fullscreen-projects__slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.55) saturate(0.9);
+    transform: scale(1.04);
+    transition: transform 8s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .fullscreen-projects__slide.is-active img {
+    transform: scale(1);
+  }
+
+  /* Geometric grid dissolve overlay */
+  .fullscreen-projects__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 1px;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .fullscreen-projects__grid.is-dissolving {
+    opacity: 1;
+  }
+
+  .fullscreen-projects__grid-cell {
+    background: var(--paper);
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: scale(1.02);
+    will-change: opacity, transform;
+  }
+
+  .fullscreen-projects__grid.is-dissolving .fullscreen-projects__grid-cell {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: calc(var(--cell-i, 0) * 12ms);
+  }
+
+  .fullscreen-projects__grid.is-dissolving.is-revealing .fullscreen-projects__grid-cell {
+    opacity: 0;
+    transform: scale(0.98);
+    transition-delay: calc(var(--cell-i, 0) * 12ms);
+  }
+
+  .fullscreen-projects__overlay {
+    position: relative;
+    z-index: 3;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 var(--gutter) clamp(2rem, 6vw, 4rem);
+    pointer-events: none;
+  }
+
+  .fullscreen-projects__overlay .wrap {
+    pointer-events: auto;
+  }
+
+  .fullscreen-projects__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .fullscreen-projects__header .eyebrow {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .fullscreen-projects__header h2 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 5vw, 4rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: #fff;
+  }
+
+  .fullscreen-projects__nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2rem);
+  }
+
+  .fullscreen-projects__dots {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .fullscreen-projects__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.3s var(--ease), transform 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+
+  .fullscreen-projects__dot:hover {
+    transform: scale(1.3);
+    border-color: #fff;
+  }
+
+  .fullscreen-projects__dot.is-active {
+    background: #fff;
+    border-color: #fff;
+  }
+
+  .fullscreen-projects__dot:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .fullscreen-projects__arrows {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .fullscreen-projects__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+    font-family: inherit;
+  }
+
+  .fullscreen-projects__arrow:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+    transform: scale(1.05);
+  }
+
+  .fullscreen-projects__arrow:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .fullscreen-projects__meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: clamp(1rem, 2.5vw, 1.5rem);
+  }
+
+  .fullscreen-projects__meta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .fullscreen-projects__meta-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(1.35rem, 2.8vw, 2.2rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+
+  .fullscreen-projects__meta-category {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .fullscreen-projects__meta-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .fullscreen-projects__meta-year {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.05em;
+  }
+
+  .fullscreen-projects__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    padding-bottom: 0.35rem;
+    cursor: pointer;
+    background: none;
+    font-family: inherit;
+    transition: gap 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+
+  .fullscreen-projects__cta:hover {
+    gap: 1rem;
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Progress bar for auto-advance */
+  .fullscreen-projects__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 4;
+  }
+
+  .fullscreen-projects__progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.1s linear;
+  }
+
+  @media (max-width: 760px) {
+    .fullscreen-projects__grid {
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+    }
+    .fullscreen-projects__overlay {
+      padding-bottom: 2rem;
+    }
+    .fullscreen-projects__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .fullscreen-projects__header h2 {
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+    }
+    .fullscreen-projects__meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .fullscreen-projects__meta-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .fullscreen-projects__arrow {
+      width: 40px;
+      height: 40px;
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .fullscreen-projects__grid {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+    }
+  }
+
   /* ---------- COVER FLOW CAROUSEL (Interior Samples) — RECTANGULAR ---------- */
   .coverflow-section {
     margin-top: clamp(2rem, 5vw, 3rem);
@@ -1091,7 +1405,6 @@
     margin-left: calc(-1 * clamp(130px, 18vw, 200px));
     border-radius: 4px;
     overflow: hidden;
-    /* Placeholder gradient so there's a visible base while loading */
     background: linear-gradient(135deg, #e6e1d8 0%, #d9d3ca 100%);
     box-shadow: 0 12px 30px -12px rgba(20, 17, 15, 0.4);
     transition: transform 0.6s var(--ease-out),
@@ -1220,7 +1533,6 @@
     }
   }
 
-  /* Auto-expanded state when the samples section is reached */
   .coverflow.is-expanded {
     max-width: 1200px;
   }
@@ -1343,7 +1655,6 @@
 
   /* =========================================================
      FULL-SCREEN OVERLAY MENU
-     (used by the site header AND the Interior/Architecture/Urban chrome)
      ========================================================= */
   .burger-menu {
     position: fixed;
@@ -1455,7 +1766,6 @@
   .burger-menu__foot a { color: var(--ink); }
   .burger-menu__foot a:hover { color: var(--accent); }
 
-  /* Close button inside the overlay — hidden in the flow chrome (which keeps its FAB) */
   .overlay-close {
     position: fixed;
     top: calc((var(--header-h) - 44px) / 2);
@@ -1787,6 +2097,9 @@
     .menu-toggle:hover { border-color: var(--line); background: transparent; }
     .burger-menu__nav a:hover { color: var(--ink); padding-left: 0; }
     .overlay-close:hover { border-color: var(--line); background: transparent; }
+    .fullscreen-projects__arrow:hover { background: transparent; border-color: rgba(255,255,255,0.3); transform: none; }
+    .fullscreen-projects__cta:hover { gap: 0.6rem; color: #fff; border-color: rgba(255,255,255,0.4); }
+    .fullscreen-projects__dot:hover { transform: none; border-color: rgba(255,255,255,0.5); }
   }
 
   @media (max-width: 760px) {
@@ -1957,7 +2270,6 @@
       max-width: calc(100vw - 2 * var(--gutter) - 64px);
     }
 
-    /* Full-screen overlay menu — mobile tuning */
     .burger-menu {
       padding-top: calc(var(--header-h) + 1.25rem);
       padding-bottom: 1.75rem;
@@ -1974,6 +2286,36 @@
       margin-top: 1.5rem;
     }
     .overlay-close { width: 44px; height: 44px; }
+
+    .fullscreen-projects__grid {
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+    }
+    .fullscreen-projects__overlay {
+      padding-bottom: 2rem;
+    }
+    .fullscreen-projects__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .fullscreen-projects__header h2 {
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+    }
+    .fullscreen-projects__meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .fullscreen-projects__meta-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .fullscreen-projects__arrow {
+      width: 40px;
+      height: 40px;
+      font-size: 0.95rem;
+    }
   }
 
   @media (max-width: 400px) {
@@ -1982,6 +2324,10 @@
     .hero__logo { width: 48px; }
     .idv__index .idx-label { font-size: 1rem; }
     .magazine__section-title { font-size: 1.35rem; }
+    .fullscreen-projects__grid {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+    }
   }
 
   @media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
@@ -2000,6 +2346,11 @@
       padding-block: 2.5rem;
     }
     .burger-menu { justify-content: flex-start; }
+    .fullscreen-projects {
+      height: auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -2035,6 +2386,11 @@
     .idv__content { opacity: 1 !important; }
     .idv__cue::after { animation: none; transform: scaleX(1); opacity: 1; }
     .stack-cue::after { animation: none; transform: scaleX(1); opacity: 1; }
+
+    .fullscreen-projects__slide { transition: none; }
+    .fullscreen-projects__slide img { transition: none; transform: none !important; }
+    .fullscreen-projects__grid { display: none; }
+    .fullscreen-projects__progress-bar { transition: none; }
   }
 </style>
 </head>
@@ -2149,64 +2505,37 @@
       </div>
     </div>
 
-    <div class="wrap section-block" id="work">
-      <div class="section-head reveal">
-        <div>
-          <p class="eyebrow">Selected work</p>
-          <h2 class="display" style="font-size: clamp(2rem, 4vw, 3.25rem);">Recent projects</h2>
+    <!-- ============ SELECTED WORK — FULLSCREEN BACKGROUND PROJECT SLIDESHOW ============ -->
+    <div class="fullscreen-projects" id="fullscreenProjects">
+      <div class="fullscreen-projects__bg-stack" id="fsBgStack"></div>
+      <div class="fullscreen-projects__grid" id="fsGrid" aria-hidden="true"></div>
+      <div class="fullscreen-projects__overlay">
+        <div class="wrap">
+          <div class="fullscreen-projects__header">
+            <div>
+              <p class="eyebrow">Selected work</p>
+              <h2>Recent projects</h2>
+            </div>
+            <a href="#" class="fullscreen-projects__cta" data-route="work">All projects <span class="arrow">→</span></a>
+          </div>
+          <div class="fullscreen-projects__meta">
+            <div class="fullscreen-projects__meta-left">
+              <span class="fullscreen-projects__meta-title" id="fsTitle">Harbour Point</span>
+              <span class="fullscreen-projects__meta-category" id="fsCategory">Mixed-use</span>
+            </div>
+            <div class="fullscreen-projects__meta-right">
+              <span class="fullscreen-projects__meta-year" id="fsYear">2024</span>
+              <div class="fullscreen-projects__arrows">
+                <button class="fullscreen-projects__arrow" id="fsPrev" aria-label="Previous project">←</button>
+                <button class="fullscreen-projects__arrow" id="fsNext" aria-label="Next project">→</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <a href="#" class="btn" data-route="work">All projects <span class="arrow">→</span></a>
       </div>
-
-      <div class="projects" id="projectGrid">
-        <article class="card card--wide reveal" data-project="Harbour Point" tabindex="0">
-          <div class="card__img-wrap">
-            <img data-parallax src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=80" alt="Glass tower with geometric facade" loading="lazy" />
-          </div>
-          <div class="card__meta"><h3>Harbour Point</h3><span>Mixed-use · 2024</span></div>
-        </article>
-
-        <article class="card card--tall reveal" data-project="Villa Norr" tabindex="0">
-          <div class="card__img-wrap">
-            <img data-parallax src="https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1200&q=80" alt="Minimal concrete residence" loading="lazy" />
-          </div>
-          <div class="card__meta"><h3>Villa Norr</h3><span>Residential · 2023</span></div>
-        </article>
-
-        <article class="card card--half reveal" data-project="The Atrium" tabindex="0">
-          <div class="card__img-wrap">
-            <img data-parallax src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1400&q=80" alt="Bright open-plan office interior" loading="lazy" />
-          </div>
-          <div class="card__meta"><h3>The Atrium</h3><span>Workplace · 2024</span></div>
-        </article>
-
-        <article class="card card--half reveal" data-project="Civic Hall" tabindex="0">
-          <div class="card__img-wrap">
-            <img data-parallax src="https://images.unsplash.com/photo-1470723710355-95304d8aece4?auto=format&fit=crop&w=1400&q=80" alt="Cultural building with public plaza" loading="lazy" />
-          </div>
-          <div class="card__meta"><h3>Civic Hall</h3><span>Cultural · 2022</span></div>
-        </article>
-
-        <article class="card card--third reveal" data-project="Pavilion 09" tabindex="0">
-          <div class="card__img-wrap">
-            <img data-parallax src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80" alt="Timber-clad pavilion" loading="lazy" />
-          </div>
-          <div class="card__meta"><h3>Pavilion 09</h3><span>Public · 2023</span></div>
-        </article>
-
-        <article class="card card--third reveal" data-project="Line House" tabindex="0">
-          <div class="card__img-wrap">
-            <img data-parallax src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80" alt="Contemporary living space" loading="lazy" />
-          </div>
-          <div class="card__meta"><h3>Line House</h3><span>Interiors · 2024</span></div>
-        </article>
-
-        <article class="card card--third reveal" data-project="North Quarter" tabindex="0">
-          <div class="card__img-wrap">
-            <img data-parallax src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80" alt="Urban masterplan aerial" loading="lazy" />
-          </div>
-          <div class="card__meta"><h3>North Quarter</h3><span>Masterplan · 2025</span></div>
-        </article>
+      <div class="fullscreen-projects__dots" id="fsDots" role="tablist" aria-label="Project navigation"></div>
+      <div class="fullscreen-projects__progress">
+        <div class="fullscreen-projects__progress-bar" id="fsProgressBar"></div>
       </div>
     </div>
 
@@ -3746,8 +4075,6 @@
 
   /* --- Preload helpers (hoisted so the router can call them) --- */
   function preloadCarouselImages() {
-    // Use <link rel="preload"> for the first two images so they start
-    // downloading as early as possible, with the correct priority.
     carouselSources.slice(0, 2).forEach((src, i) => {
       if (document.querySelector(`link[data-carousel-preload="${i}"]`)) return;
       const link = document.createElement('link');
@@ -3761,8 +4088,6 @@
   }
 
   function warmCarouselCache() {
-    // Fetch remaining images at idle time to fill the HTTP cache
-    // without competing with the hero / above-the-fold resources.
     carouselSources.forEach((src, i) => {
       const img = new Image();
       img.decoding = 'async';
@@ -3772,7 +4097,6 @@
     });
   }
 
-  // Kick off background cache warming once the page is idle.
   if ('requestIdleCallback' in window) {
     requestIdleCallback(warmCarouselCache, { timeout: 4000 });
   } else {
@@ -3808,8 +4132,6 @@
       const img = document.createElement('img');
       img.src = p.src;
       img.alt = p.title + ' — interior design project';
-      // Eager-load the first few so the visible slides render fast;
-      // lazy-load the rest.
       img.loading = i < 3 ? 'eager' : 'lazy';
       img.decoding = 'async';
       if (i === 0) img.fetchPriority = 'high';
@@ -3945,7 +4267,6 @@
     } else {
       window.addEventListener('load', layout);
     }
-    /* also run once immediately for instant feedback */
     requestAnimationFrame(layout);
 
     /* --- auto-expand when the carousel lands in view --- */
@@ -3956,7 +4277,6 @@
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               coverflow.classList.add('is-expanded');
-              /* re-layout once the expansion transition begins, and once it ends */
               requestAnimationFrame(layout);
               setTimeout(layout, 820);
               expandObserver.unobserve(entry.target);
@@ -3967,6 +4287,254 @@
       );
       expandObserver.observe(coverflow);
     }
+  })();
+
+  /* =========================================================
+     10. FULLSCREEN PROJECT BACKGROUND SLIDESHOW
+          (with geometric grid dissolve transition)
+     ========================================================= */
+  (function initFullscreenProjects() {
+    const container = document.getElementById('fullscreenProjects');
+    const bgStack = document.getElementById('fsBgStack');
+    const gridEl = document.getElementById('fsGrid');
+    const dotsContainer = document.getElementById('fsDots');
+    const titleEl = document.getElementById('fsTitle');
+    const categoryEl = document.getElementById('fsCategory');
+    const yearEl = document.getElementById('fsYear');
+    const prevBtn = document.getElementById('fsPrev');
+    const nextBtn = document.getElementById('fsNext');
+    const progressBar = document.getElementById('fsProgressBar');
+
+    if (!container || !bgStack) return;
+
+    /* Project data — matched to the original selected work grid */
+    const projects = [
+      { title: 'Harbour Point', category: 'Mixed-use', year: '2024', src: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=2400&q=85' },
+      { title: 'Villa Norr', category: 'Residential', year: '2023', src: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=2400&q=85' },
+      { title: 'The Atrium', category: 'Workplace', year: '2024', src: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=2400&q=85' },
+      { title: 'Civic Hall', category: 'Cultural', year: '2022', src: 'https://images.unsplash.com/photo-1470723710355-95304d8aece4?auto=format&fit=crop&w=2400&q=85' },
+      { title: 'Pavilion 09', category: 'Public', year: '2023', src: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=2400&q=85' },
+      { title: 'Line House', category: 'Interiors', year: '2024', src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=85' },
+      { title: 'North Quarter', category: 'Masterplan', year: '2025', src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2400&q=85' }
+    ];
+
+    let currentIndex = 0;
+    let slideElements = [];
+    let dotElements = [];
+    let autoTimer = null;
+    let progressInterval = null;
+    let isTransitioning = false;
+    const AUTO_INTERVAL = 6000;
+    const PROGRESS_STEP = 50;
+
+    /* --- Build slides --- */
+    projects.forEach((p, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'fullscreen-projects__slide' + (i === 0 ? ' is-active' : '');
+      slide.dataset.index = i;
+
+      const img = document.createElement('img');
+      img.src = p.src;
+      img.alt = p.title + ' — ' + p.category;
+      img.loading = i === 0 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      if (i === 0) img.fetchPriority = 'high';
+      slide.appendChild(img);
+      bgStack.appendChild(slide);
+      slideElements.push(slide);
+    });
+
+    /* --- Build grid cells (geometric dissolve) --- */
+    if (gridEl) {
+      const cellCount = 48; // 8 cols × 6 rows = 48
+      for (let i = 0; i < cellCount; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'fullscreen-projects__grid-cell';
+        cell.style.setProperty('--cell-i', i);
+        gridEl.appendChild(cell);
+      }
+    }
+
+    /* --- Build dots --- */
+    if (dotsContainer) {
+      projects.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'fullscreen-projects__dot' + (i === 0 ? ' is-active' : '');
+        dot.type = 'button';
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `Show project ${i + 1}: ${projects[i].title}`);
+        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+        dot.addEventListener('click', () => goTo(i, true));
+        dotsContainer.appendChild(dot);
+        dotElements.push(dot);
+      });
+    }
+
+    /* --- Update meta --- */
+    function updateMeta() {
+      const p = projects[currentIndex];
+      if (titleEl) titleEl.textContent = p.title;
+      if (categoryEl) categoryEl.textContent = p.category;
+      if (yearEl) yearEl.textContent = p.year;
+    }
+
+    /* --- Grid dissolve transition --- */
+    function triggerDissolve(callback) {
+      if (!gridEl || reduceMotion) {
+        if (callback) callback();
+        return;
+      }
+
+      gridEl.classList.add('is-dissolving');
+      gridEl.classList.remove('is-revealing');
+
+      // After the grid fills, change slides and reveal
+      setTimeout(() => {
+        if (callback) callback();
+        // Small delay then reveal
+        setTimeout(() => {
+          gridEl.classList.add('is-revealing');
+          // Clean up after reveal completes
+          setTimeout(() => {
+            gridEl.classList.remove('is-dissolving', 'is-revealing');
+          }, 900);
+        }, 80);
+      }, 600);
+    }
+
+    /* --- Navigate to a slide --- */
+    function goTo(index, userInitiated = false) {
+      if (isTransitioning) return;
+      if (index === currentIndex && slideElements.length > 1 && !userInitiated) return;
+
+      let nextIndex = index;
+      if (nextIndex < 0) nextIndex = slideElements.length - 1;
+      if (nextIndex >= slideElements.length) nextIndex = 0;
+
+      if (nextIndex === currentIndex && userInitiated) return;
+
+      isTransitioning = true;
+
+      // Update dots immediately for responsiveness
+      dotElements.forEach((d, i) => {
+        d.classList.toggle('is-active', i === nextIndex);
+        d.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
+      });
+
+      const doChange = () => {
+        // Swap active slide
+        slideElements.forEach((s, i) => {
+          s.classList.toggle('is-active', i === nextIndex);
+        });
+        currentIndex = nextIndex;
+        updateMeta();
+        resetProgress();
+        isTransitioning = false;
+      };
+
+      if (reduceMotion) {
+        doChange();
+      } else {
+        triggerDissolve(doChange);
+      }
+
+      if (userInitiated) restartAutoTimer();
+    }
+
+    function nextSlide() { goTo(currentIndex + 1); }
+    function prevSlide() { goTo(currentIndex - 1); }
+
+    /* --- Auto-advance timer --- */
+    function startAutoTimer() {
+      if (reduceMotion) return;
+      stopAutoTimer();
+      autoTimer = setInterval(nextSlide, AUTO_INTERVAL);
+      startProgress();
+    }
+
+    function stopAutoTimer() {
+      if (autoTimer) clearInterval(autoTimer);
+      autoTimer = null;
+      stopProgress();
+    }
+
+    function restartAutoTimer() {
+      stopAutoTimer();
+      startAutoTimer();
+    }
+
+    /* --- Progress bar --- */
+    let progressValue = 0;
+    function startProgress() {
+      stopProgress();
+      progressValue = 0;
+      if (progressBar) progressBar.style.width = '0%';
+      progressInterval = setInterval(() => {
+        progressValue += (PROGRESS_STEP / AUTO_INTERVAL) * 100;
+        if (progressValue >= 100) progressValue = 100;
+        if (progressBar) progressBar.style.width = progressValue + '%';
+      }, PROGRESS_STEP);
+    }
+
+    function stopProgress() {
+      if (progressInterval) clearInterval(progressInterval);
+      progressInterval = null;
+    }
+
+    function resetProgress() {
+      stopProgress();
+      progressValue = 0;
+      if (progressBar) progressBar.style.width = '0%';
+      if (autoTimer) startProgress();
+    }
+
+    /* --- Controls --- */
+    if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); restartAutoTimer(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); restartAutoTimer(); });
+
+    /* --- Pause on hover --- */
+    container.addEventListener('mouseenter', () => {
+      stopAutoTimer();
+      stopProgress();
+    });
+    container.addEventListener('mouseleave', () => {
+      if (!reduceMotion) {
+        startAutoTimer();
+      }
+    });
+
+    /* --- Pause when tab is hidden --- */
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopAutoTimer();
+        stopProgress();
+      } else {
+        if (!reduceMotion) startAutoTimer();
+      }
+    });
+
+    /* --- Keyboard navigation --- */
+    container.setAttribute('tabindex', '0');
+    container.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); restartAutoTimer(); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); restartAutoTimer(); }
+    });
+
+    /* --- Initialize --- */
+    updateMeta();
+
+    if (!reduceMotion) {
+      startAutoTimer();
+    }
+
+    // Preload next image for smoother transition
+    function preloadNext() {
+      const nextIdx = (currentIndex + 1) % projects.length;
+      const img = new Image();
+      img.src = projects[nextIdx].src;
+    }
+    preloadNext();
+    setInterval(preloadNext, 10000);
   })();
 
 })();
