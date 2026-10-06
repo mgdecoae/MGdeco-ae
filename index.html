@@ -1363,6 +1363,321 @@
     }
   }
 
+  /* =========================================================
+     INTERIOR SAMPLES — FULLSCREEN BACKGROUND SLIDESHOW
+     ========================================================= */
+  .fullscreen-interior {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #1a1816;
+    color: #fff;
+    margin-top: clamp(2rem, 5vw, 3rem);
+  }
+
+  .fullscreen-interior__bg-stack {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .fullscreen-interior__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity;
+    z-index: 0;
+  }
+
+  .fullscreen-interior__slide.is-active {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .fullscreen-interior__slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.55) saturate(0.9);
+    transform: scale(1.04);
+    transition: transform 8s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .fullscreen-interior__slide.is-active img {
+    transform: scale(1);
+  }
+
+  /* Geometric grid dissolve overlay */
+  .fullscreen-interior__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 1px;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .fullscreen-interior__grid.is-dissolving {
+    opacity: 1;
+  }
+
+  .fullscreen-interior__grid-cell {
+    background: var(--paper);
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: scale(1.02);
+    will-change: opacity, transform;
+  }
+
+  .fullscreen-interior__grid.is-dissolving .fullscreen-interior__grid-cell {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: calc(var(--cell-i, 0) * 12ms);
+  }
+
+  .fullscreen-interior__grid.is-dissolving.is-revealing .fullscreen-interior__grid-cell {
+    opacity: 0;
+    transform: scale(0.98);
+    transition-delay: calc(var(--cell-i, 0) * 12ms);
+  }
+
+  .fullscreen-interior__overlay {
+    position: relative;
+    z-index: 3;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 var(--gutter) clamp(2rem, 6vw, 4rem);
+    pointer-events: none;
+  }
+
+  .fullscreen-interior__overlay .wrap {
+    pointer-events: auto;
+  }
+
+  .fullscreen-interior__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .fullscreen-interior__header .eyebrow {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .fullscreen-interior__header h2 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 5vw, 4rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: #fff;
+  }
+
+  .fullscreen-interior__nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2rem);
+  }
+
+  .fullscreen-interior__dots {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .fullscreen-interior__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.3s var(--ease), transform 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+
+  .fullscreen-interior__dot:hover {
+    transform: scale(1.3);
+    border-color: #fff;
+  }
+
+  .fullscreen-interior__dot.is-active {
+    background: #fff;
+    border-color: #fff;
+  }
+
+  .fullscreen-interior__dot:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .fullscreen-interior__arrows {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .fullscreen-interior__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+    font-family: inherit;
+  }
+
+  .fullscreen-interior__arrow:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+    transform: scale(1.05);
+  }
+
+  .fullscreen-interior__arrow:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .fullscreen-interior__meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: clamp(1rem, 2.5vw, 1.5rem);
+  }
+
+  .fullscreen-interior__meta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .fullscreen-interior__meta-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(1.35rem, 2.8vw, 2.2rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+
+  .fullscreen-interior__meta-category {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .fullscreen-interior__meta-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .fullscreen-interior__meta-year {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.05em;
+  }
+
+  .fullscreen-interior__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    padding-bottom: 0.35rem;
+    cursor: pointer;
+    background: none;
+    font-family: inherit;
+    transition: gap 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+
+  .fullscreen-interior__cta:hover {
+    gap: 1rem;
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Progress bar for auto-advance */
+  .fullscreen-interior__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 4;
+  }
+
+  .fullscreen-interior__progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.1s linear;
+  }
+
+  @media (max-width: 760px) {
+    .fullscreen-interior__grid {
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+    }
+    .fullscreen-interior__overlay {
+      padding-bottom: 2rem;
+    }
+    .fullscreen-interior__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .fullscreen-interior__header h2 {
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+    }
+    .fullscreen-interior__meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .fullscreen-interior__meta-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .fullscreen-interior__arrow {
+      width: 40px;
+      height: 40px;
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .fullscreen-interior__grid {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+    }
+  }
+
   /* ---------- COVER FLOW CAROUSEL (Interior Samples) — RECTANGULAR ---------- */
   .coverflow-section {
     margin-top: clamp(2rem, 5vw, 3rem);
@@ -2100,6 +2415,9 @@
     .fullscreen-projects__arrow:hover { background: transparent; border-color: rgba(255,255,255,0.3); transform: none; }
     .fullscreen-projects__cta:hover { gap: 0.6rem; color: #fff; border-color: rgba(255,255,255,0.4); }
     .fullscreen-projects__dot:hover { transform: none; border-color: rgba(255,255,255,0.5); }
+    .fullscreen-interior__arrow:hover { background: transparent; border-color: rgba(255,255,255,0.3); transform: none; }
+    .fullscreen-interior__cta:hover { gap: 0.6rem; color: #fff; border-color: rgba(255,255,255,0.4); }
+    .fullscreen-interior__dot:hover { transform: none; border-color: rgba(255,255,255,0.5); }
   }
 
   @media (max-width: 760px) {
@@ -2316,6 +2634,36 @@
       height: 40px;
       font-size: 0.95rem;
     }
+
+    .fullscreen-interior__grid {
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+    }
+    .fullscreen-interior__overlay {
+      padding-bottom: 2rem;
+    }
+    .fullscreen-interior__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .fullscreen-interior__header h2 {
+      font-size: clamp(1.6rem, 7vw, 2.4rem);
+    }
+    .fullscreen-interior__meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .fullscreen-interior__meta-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .fullscreen-interior__arrow {
+      width: 40px;
+      height: 40px;
+      font-size: 0.95rem;
+    }
   }
 
   @media (max-width: 400px) {
@@ -2325,6 +2673,10 @@
     .idv__index .idx-label { font-size: 1rem; }
     .magazine__section-title { font-size: 1.35rem; }
     .fullscreen-projects__grid {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+    }
+    .fullscreen-interior__grid {
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(10, 1fr);
     }
@@ -2347,6 +2699,11 @@
     }
     .burger-menu { justify-content: flex-start; }
     .fullscreen-projects {
+      height: auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+    .fullscreen-interior {
       height: auto;
       min-height: 100vh;
       min-height: 100dvh;
@@ -2391,6 +2748,11 @@
     .fullscreen-projects__slide img { transition: none; transform: none !important; }
     .fullscreen-projects__grid { display: none; }
     .fullscreen-projects__progress-bar { transition: none; }
+
+    .fullscreen-interior__slide { transition: none; }
+    .fullscreen-interior__slide img { transition: none; transform: none !important; }
+    .fullscreen-interior__grid { display: none; }
+    .fullscreen-interior__progress-bar { transition: none; }
   }
 </style>
 </head>
@@ -2798,39 +3160,43 @@
         </div>
       </div>
 
-      <!-- ---------- CARD 4 — SAMPLES OF WORK (Cover Flow Carousel) ---------- -->
+      <!-- ---------- CARD 4 — SAMPLES OF WORK (FULLSCREEN BACKGROUND SLIDESHOW) ---------- -->
       <div class="idv__content" data-stack="4" id="idv-samples">
-        <div class="wrap magazine">
 
-          <div class="magazine__section-head reveal">
-            <div>
-              <p class="eyebrow">Samples of work</p>
-              <h2 class="magazine__section-title">Recent interior work</h2>
-            </div>
-            <span class="eyebrow">Joud Coffee</span>
-          </div>
-
-          <div class="coverflow-section reveal">
-            <div class="coverflow" id="coverflowInterior">
-              <div class="coverflow__stage" id="cfStage" role="region" aria-label="Interior design project carousel">
-                <div class="coverflow__track" id="cfTrack">
-                  <!-- Items will be injected by JS -->
+        <!-- ============ INTERIOR SAMPLES — FULLSCREEN BACKGROUND SLIDESHOW ============ -->
+        <div class="fullscreen-interior" id="fullscreenInterior">
+          <div class="fullscreen-interior__bg-stack" id="fiBgStack"></div>
+          <div class="fullscreen-interior__grid" id="fiGrid" aria-hidden="true"></div>
+          <div class="fullscreen-interior__overlay">
+            <div class="wrap">
+              <div class="fullscreen-interior__header">
+                <div>
+                  <p class="eyebrow">Interior work</p>
+                  <h2>Joud Coffee</h2>
+                </div>
+                <a href="#" class="fullscreen-interior__cta" data-route="work">View project <span class="arrow">→</span></a>
+              </div>
+              <div class="fullscreen-interior__meta">
+                <div class="fullscreen-interior__meta-left">
+                  <span class="fullscreen-interior__meta-title" id="fiTitle">Joud Coffee</span>
+                  <span class="fullscreen-interior__meta-category" id="fiCategory">Interiors</span>
+                </div>
+                <div class="fullscreen-interior__meta-right">
+                  <span class="fullscreen-interior__meta-year" id="fiYear">2023</span>
+                  <div class="fullscreen-interior__arrows">
+                    <button class="fullscreen-interior__arrow" id="fiPrev" aria-label="Previous interior image">←</button>
+                    <button class="fullscreen-interior__arrow" id="fiNext" aria-label="Next interior image">→</button>
+                  </div>
                 </div>
               </div>
-              <div class="coverflow__controls">
-                <button class="coverflow__btn" id="cfPrev" aria-label="Previous project">←</button>
-                <div class="coverflow__dots" id="cfDots" role="tablist" aria-label="Project navigation"></div>
-                <button class="coverflow__btn" id="cfNext" aria-label="Next project">→</button>
-              </div>
             </div>
           </div>
-
-          <div class="view-body reveal" style="padding-top: clamp(2.5rem, 5vw, 4rem); padding-bottom: 0; max-width: 62ch;">
-            <p>To discuss an interior project, get in touch:</p>
-            <p><a href="mailto:enquiry@mgdeco.ae" class="btn">enquiry@mgdeco.ae <span class="arrow">→</span></a></p>
+          <div class="fullscreen-interior__dots" id="fiDots" role="tablist" aria-label="Interior image navigation"></div>
+          <div class="fullscreen-interior__progress">
+            <div class="fullscreen-interior__progress-bar" id="fiProgressBar"></div>
           </div>
-
         </div>
+
       </div>
 
     </div>
@@ -4423,6 +4789,246 @@
 
       const doChange = () => {
         // Swap active slide
+        slideElements.forEach((s, i) => {
+          s.classList.toggle('is-active', i === nextIndex);
+        });
+        currentIndex = nextIndex;
+        updateMeta();
+        resetProgress();
+        isTransitioning = false;
+      };
+
+      if (reduceMotion) {
+        doChange();
+      } else {
+        triggerDissolve(doChange);
+      }
+
+      if (userInitiated) restartAutoTimer();
+    }
+
+    function nextSlide() { goTo(currentIndex + 1); }
+    function prevSlide() { goTo(currentIndex - 1); }
+
+    /* --- Auto-advance timer --- */
+    function startAutoTimer() {
+      if (reduceMotion) return;
+      stopAutoTimer();
+      autoTimer = setInterval(nextSlide, AUTO_INTERVAL);
+      startProgress();
+    }
+
+    function stopAutoTimer() {
+      if (autoTimer) clearInterval(autoTimer);
+      autoTimer = null;
+      stopProgress();
+    }
+
+    function restartAutoTimer() {
+      stopAutoTimer();
+      startAutoTimer();
+    }
+
+    /* --- Progress bar --- */
+    let progressValue = 0;
+    function startProgress() {
+      stopProgress();
+      progressValue = 0;
+      if (progressBar) progressBar.style.width = '0%';
+      progressInterval = setInterval(() => {
+        progressValue += (PROGRESS_STEP / AUTO_INTERVAL) * 100;
+        if (progressValue >= 100) progressValue = 100;
+        if (progressBar) progressBar.style.width = progressValue + '%';
+      }, PROGRESS_STEP);
+    }
+
+    function stopProgress() {
+      if (progressInterval) clearInterval(progressInterval);
+      progressInterval = null;
+    }
+
+    function resetProgress() {
+      stopProgress();
+      progressValue = 0;
+      if (progressBar) progressBar.style.width = '0%';
+      if (autoTimer) startProgress();
+    }
+
+    /* --- Controls --- */
+    if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); restartAutoTimer(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); restartAutoTimer(); });
+
+    /* --- Pause on hover --- */
+    container.addEventListener('mouseenter', () => {
+      stopAutoTimer();
+      stopProgress();
+    });
+    container.addEventListener('mouseleave', () => {
+      if (!reduceMotion) {
+        startAutoTimer();
+      }
+    });
+
+    /* --- Pause when tab is hidden --- */
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopAutoTimer();
+        stopProgress();
+      } else {
+        if (!reduceMotion) startAutoTimer();
+      }
+    });
+
+    /* --- Keyboard navigation --- */
+    container.setAttribute('tabindex', '0');
+    container.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); restartAutoTimer(); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); restartAutoTimer(); }
+    });
+
+    /* --- Initialize --- */
+    updateMeta();
+
+    if (!reduceMotion) {
+      startAutoTimer();
+    }
+
+    // Preload next image for smoother transition
+    function preloadNext() {
+      const nextIdx = (currentIndex + 1) % projects.length;
+      const img = new Image();
+      img.src = projects[nextIdx].src;
+    }
+    preloadNext();
+    setInterval(preloadNext, 10000);
+  })();
+
+  /* =========================================================
+     11. FULLSCREEN INTERIOR BACKGROUND SLIDESHOW
+          (Joud Coffee images with geometric grid dissolve)
+     ========================================================= */
+  (function initFullscreenInterior() {
+    const container = document.getElementById('fullscreenInterior');
+    const bgStack = document.getElementById('fiBgStack');
+    const gridEl = document.getElementById('fiGrid');
+    const dotsContainer = document.getElementById('fiDots');
+    const titleEl = document.getElementById('fiTitle');
+    const categoryEl = document.getElementById('fiCategory');
+    const yearEl = document.getElementById('fiYear');
+    const prevBtn = document.getElementById('fiPrev');
+    const nextBtn = document.getElementById('fiNext');
+    const progressBar = document.getElementById('fiProgressBar');
+
+    if (!container || !bgStack) return;
+
+    /* Interior project data — Joud Coffee images from the carousel */
+    const projects = carouselSources.map((src) => ({
+      title: 'Joud Coffee',
+      category: 'Interiors',
+      year: '2023',
+      src
+    }));
+
+    let currentIndex = 0;
+    let slideElements = [];
+    let dotElements = [];
+    let autoTimer = null;
+    let progressInterval = null;
+    let isTransitioning = false;
+    const AUTO_INTERVAL = 6000;
+    const PROGRESS_STEP = 50;
+
+    /* --- Build slides --- */
+    projects.forEach((p, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'fullscreen-interior__slide' + (i === 0 ? ' is-active' : '');
+      slide.dataset.index = i;
+
+      const img = document.createElement('img');
+      img.src = p.src;
+      img.alt = p.title + ' — ' + p.category + ' interior';
+      img.loading = i === 0 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      if (i === 0) img.fetchPriority = 'high';
+      slide.appendChild(img);
+      bgStack.appendChild(slide);
+      slideElements.push(slide);
+    });
+
+    /* --- Build grid cells (geometric dissolve) --- */
+    if (gridEl) {
+      const cellCount = 48; // 8 cols × 6 rows = 48
+      for (let i = 0; i < cellCount; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'fullscreen-interior__grid-cell';
+        cell.style.setProperty('--cell-i', i);
+        gridEl.appendChild(cell);
+      }
+    }
+
+    /* --- Build dots --- */
+    if (dotsContainer) {
+      projects.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'fullscreen-interior__dot' + (i === 0 ? ' is-active' : '');
+        dot.type = 'button';
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `Show interior image ${i + 1}`);
+        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+        dot.addEventListener('click', () => goTo(i, true));
+        dotsContainer.appendChild(dot);
+        dotElements.push(dot);
+      });
+    }
+
+    /* --- Update meta --- */
+    function updateMeta() {
+      const p = projects[currentIndex];
+      if (titleEl) titleEl.textContent = p.title;
+      if (categoryEl) categoryEl.textContent = p.category;
+      if (yearEl) yearEl.textContent = p.year;
+    }
+
+    /* --- Grid dissolve transition --- */
+    function triggerDissolve(callback) {
+      if (!gridEl || reduceMotion) {
+        if (callback) callback();
+        return;
+      }
+
+      gridEl.classList.add('is-dissolving');
+      gridEl.classList.remove('is-revealing');
+
+      setTimeout(() => {
+        if (callback) callback();
+        setTimeout(() => {
+          gridEl.classList.add('is-revealing');
+          setTimeout(() => {
+            gridEl.classList.remove('is-dissolving', 'is-revealing');
+          }, 900);
+        }, 80);
+      }, 600);
+    }
+
+    /* --- Navigate to a slide --- */
+    function goTo(index, userInitiated = false) {
+      if (isTransitioning) return;
+      if (index === currentIndex && slideElements.length > 1 && !userInitiated) return;
+
+      let nextIndex = index;
+      if (nextIndex < 0) nextIndex = slideElements.length - 1;
+      if (nextIndex >= slideElements.length) nextIndex = 0;
+
+      if (nextIndex === currentIndex && userInitiated) return;
+
+      isTransitioning = true;
+
+      dotElements.forEach((d, i) => {
+        d.classList.toggle('is-active', i === nextIndex);
+        d.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
+      });
+
+      const doChange = () => {
         slideElements.forEach((s, i) => {
           s.classList.toggle('is-active', i === nextIndex);
         });
