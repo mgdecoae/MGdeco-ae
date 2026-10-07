@@ -1096,7 +1096,7 @@
     transform: scale(1);
   }
 
-  /* Geometric grid dissolve overlay */
+  /* Geometric grid dissolve overlay — diagonal wave */
   .fullscreen-projects__grid {
     position: absolute;
     inset: 0;
@@ -1117,22 +1117,22 @@
   .fullscreen-projects__grid-cell {
     background: var(--paper);
     opacity: 0;
+    transform: scale(1.02);
     transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
                 transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    transform: scale(1.02);
     will-change: opacity, transform;
   }
 
   .fullscreen-projects__grid.is-dissolving .fullscreen-projects__grid-cell {
     opacity: 1;
     transform: scale(1);
-    transition-delay: calc(var(--cell-i, 0) * 12ms);
+    transition-delay: var(--cell-delay, 0ms);
   }
 
   .fullscreen-projects__grid.is-dissolving.is-revealing .fullscreen-projects__grid-cell {
     opacity: 0;
     transform: scale(0.98);
-    transition-delay: calc(var(--cell-i, 0) * 12ms);
+    transition-delay: var(--cell-delay-rev, 0ms);
   }
 
   .fullscreen-projects__overlay {
@@ -1326,8 +1326,8 @@
 
   @media (max-width: 760px) {
     .fullscreen-projects__grid {
-      grid-template-columns: repeat(6, 1fr);
-      grid-template-rows: repeat(8, 1fr);
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
     }
     .fullscreen-projects__overlay {
       padding-bottom: 2rem;
@@ -1358,8 +1358,8 @@
 
   @media (max-width: 400px) {
     .fullscreen-projects__grid {
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(10, 1fr);
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
     }
   }
 
@@ -1411,7 +1411,7 @@
     transform: scale(1);
   }
 
-  /* Geometric grid dissolve overlay */
+  /* Geometric grid dissolve overlay — diagonal wave */
   .fullscreen-interior__grid {
     position: absolute;
     inset: 0;
@@ -1432,22 +1432,22 @@
   .fullscreen-interior__grid-cell {
     background: var(--paper);
     opacity: 0;
+    transform: scale(1.02);
     transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
                 transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    transform: scale(1.02);
     will-change: opacity, transform;
   }
 
   .fullscreen-interior__grid.is-dissolving .fullscreen-interior__grid-cell {
     opacity: 1;
     transform: scale(1);
-    transition-delay: calc(var(--cell-i, 0) * 12ms);
+    transition-delay: var(--cell-delay, 0ms);
   }
 
   .fullscreen-interior__grid.is-dissolving.is-revealing .fullscreen-interior__grid-cell {
     opacity: 0;
     transform: scale(0.98);
-    transition-delay: calc(var(--cell-i, 0) * 12ms);
+    transition-delay: var(--cell-delay-rev, 0ms);
   }
 
   .fullscreen-interior__overlay {
@@ -1641,8 +1641,8 @@
 
   @media (max-width: 760px) {
     .fullscreen-interior__grid {
-      grid-template-columns: repeat(6, 1fr);
-      grid-template-rows: repeat(8, 1fr);
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
     }
     .fullscreen-interior__overlay {
       padding-bottom: 2rem;
@@ -1673,8 +1673,8 @@
 
   @media (max-width: 400px) {
     .fullscreen-interior__grid {
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(10, 1fr);
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
     }
   }
 
@@ -2606,8 +2606,8 @@
     .overlay-close { width: 44px; height: 44px; }
 
     .fullscreen-projects__grid {
-      grid-template-columns: repeat(6, 1fr);
-      grid-template-rows: repeat(8, 1fr);
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
     }
     .fullscreen-projects__overlay {
       padding-bottom: 2rem;
@@ -2636,8 +2636,8 @@
     }
 
     .fullscreen-interior__grid {
-      grid-template-columns: repeat(6, 1fr);
-      grid-template-rows: repeat(8, 1fr);
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
     }
     .fullscreen-interior__overlay {
       padding-bottom: 2rem;
@@ -2673,12 +2673,12 @@
     .idv__index .idx-label { font-size: 1rem; }
     .magazine__section-title { font-size: 1.35rem; }
     .fullscreen-projects__grid {
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(10, 1fr);
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
     }
     .fullscreen-interior__grid {
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(10, 1fr);
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(6, 1fr);
     }
   }
 
@@ -4657,7 +4657,7 @@
 
   /* =========================================================
      10. FULLSCREEN PROJECT BACKGROUND SLIDESHOW
-          (with geometric grid dissolve transition)
+          (with diagonal wave grid dissolve transition)
      ========================================================= */
   (function initFullscreenProjects() {
     const container = document.getElementById('fullscreenProjects');
@@ -4710,14 +4710,34 @@
       slideElements.push(slide);
     });
 
-    /* --- Build grid cells (geometric dissolve) --- */
+    /* --- Build grid cells (diagonal wave dissolve) --- */
     if (gridEl) {
-      const cellCount = 48; // 8 cols × 6 rows = 48
-      for (let i = 0; i < cellCount; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'fullscreen-projects__grid-cell';
-        cell.style.setProperty('--cell-i', i);
-        gridEl.appendChild(cell);
+      const COLS = 8;
+      const ROWS = 6;
+      const STEP_MS = 18;       // base delay per diagonal step
+      const WAVE_AMP_MS = 90;   // extra delay from the sine wave
+      const WAVE_FREQ = 1.4;    // how many waves across the grid
+      const MAX_DIAG = (COLS - 1) + (ROWS - 1);
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'fullscreen-projects__grid-cell';
+
+          // Diagonal position: top-left → bottom-right
+          const diag = c + r;
+          const wave = Math.sin((diag / MAX_DIAG) * Math.PI * WAVE_FREQ);
+          const delayIn = Math.round(diag * STEP_MS + (wave + 1) * WAVE_AMP_MS);
+
+          // Reverse diagonal: bottom-right → top-left
+          const diagRev = (COLS - 1 - c) + (ROWS - 1 - r);
+          const waveRev = Math.sin((diagRev / MAX_DIAG) * Math.PI * WAVE_FREQ);
+          const delayOut = Math.round(diagRev * STEP_MS + (waveRev + 1) * WAVE_AMP_MS);
+
+          cell.style.setProperty('--cell-delay', delayIn + 'ms');
+          cell.style.setProperty('--cell-delay-rev', delayOut + 'ms');
+          gridEl.appendChild(cell);
+        }
       }
     }
 
@@ -4905,7 +4925,7 @@
 
   /* =========================================================
      11. FULLSCREEN INTERIOR BACKGROUND SLIDESHOW
-          (Joud Coffee images with geometric grid dissolve)
+          (Joud Coffee images with diagonal wave grid dissolve)
      ========================================================= */
   (function initFullscreenInterior() {
     const container = document.getElementById('fullscreenInterior');
@@ -4955,14 +4975,32 @@
       slideElements.push(slide);
     });
 
-    /* --- Build grid cells (geometric dissolve) --- */
+    /* --- Build grid cells (diagonal wave dissolve) --- */
     if (gridEl) {
-      const cellCount = 48; // 8 cols × 6 rows = 48
-      for (let i = 0; i < cellCount; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'fullscreen-interior__grid-cell';
-        cell.style.setProperty('--cell-i', i);
-        gridEl.appendChild(cell);
+      const COLS = 8;
+      const ROWS = 6;
+      const STEP_MS = 18;
+      const WAVE_AMP_MS = 90;
+      const WAVE_FREQ = 1.4;
+      const MAX_DIAG = (COLS - 1) + (ROWS - 1);
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'fullscreen-interior__grid-cell';
+
+          const diag = c + r;
+          const wave = Math.sin((diag / MAX_DIAG) * Math.PI * WAVE_FREQ);
+          const delayIn = Math.round(diag * STEP_MS + (wave + 1) * WAVE_AMP_MS);
+
+          const diagRev = (COLS - 1 - c) + (ROWS - 1 - r);
+          const waveRev = Math.sin((diagRev / MAX_DIAG) * Math.PI * WAVE_FREQ);
+          const delayOut = Math.round(diagRev * STEP_MS + (waveRev + 1) * WAVE_AMP_MS);
+
+          cell.style.setProperty('--cell-delay', delayIn + 'ms');
+          cell.style.setProperty('--cell-delay-rev', delayOut + 'ms');
+          gridEl.appendChild(cell);
+        }
       }
     }
 
