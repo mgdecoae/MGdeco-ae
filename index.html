@@ -1096,7 +1096,7 @@
     transform: scale(1);
   }
 
-  /* Geometric grid dissolve overlay — diagonal wave */
+  /* Mosaic grid overlay — each cell mirrors a slice of the current image */
   .fullscreen-projects__grid {
     position: absolute;
     inset: 0;
@@ -1105,9 +1105,9 @@
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 1px;
+    gap: 0;
     opacity: 0;
-    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .fullscreen-projects__grid.is-dissolving {
@@ -1115,23 +1115,57 @@
   }
 
   .fullscreen-projects__grid-cell {
-    background: var(--paper);
+    position: relative;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    /* background-image + background-size + background-position set inline per transition */
     opacity: 0;
-    transform: scale(1.02);
-    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translate3d(0, 0, 0) scale(1);
+    transition:
+      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: opacity, transform;
+    pointer-events: none;
+  }
+
+  /* Translucent white wash over each tile — makes the mosaic read clearly */
+  .fullscreen-projects__grid-cell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.72);
+    opacity: 0;
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    will-change: opacity;
   }
 
   .fullscreen-projects__grid.is-dissolving .fullscreen-projects__grid-cell {
     opacity: 1;
-    transform: scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
+    transition-delay: 0ms;
+  }
+
+  .fullscreen-projects__grid.is-dissolving .fullscreen-projects__grid-cell::after {
+    opacity: 1;
     transition-delay: var(--cell-delay, 0ms);
   }
 
   .fullscreen-projects__grid.is-dissolving.is-revealing .fullscreen-projects__grid-cell {
     opacity: 0;
-    transform: scale(0.98);
+    /* Shatter: slight scale-down + drift in the direction of the diagonal wave */
+    transform:
+      translate3d(
+        calc(var(--cell-dx, 0) * 1px),
+        calc(var(--cell-dy, 0) * 1px),
+        0
+      )
+      scale(0.94);
+    transition-delay: var(--cell-delay-rev, 0ms);
+  }
+
+  .fullscreen-projects__grid.is-dissolving.is-revealing .fullscreen-projects__grid-cell::after {
+    opacity: 0;
     transition-delay: var(--cell-delay-rev, 0ms);
   }
 
@@ -1411,7 +1445,7 @@
     transform: scale(1);
   }
 
-  /* Geometric grid dissolve overlay — diagonal wave */
+  /* Mosaic grid overlay — each cell mirrors a slice of the current image */
   .fullscreen-interior__grid {
     position: absolute;
     inset: 0;
@@ -1420,9 +1454,9 @@
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 1px;
+    gap: 0;
     opacity: 0;
-    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .fullscreen-interior__grid.is-dissolving {
@@ -1430,23 +1464,55 @@
   }
 
   .fullscreen-interior__grid-cell {
-    background: var(--paper);
+    position: relative;
+    background-color: transparent;
+    background-repeat: no-repeat;
     opacity: 0;
-    transform: scale(1.02);
-    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translate3d(0, 0, 0) scale(1);
+    transition:
+      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: opacity, transform;
+    pointer-events: none;
+  }
+
+  /* Translucent white wash over each tile */
+  .fullscreen-interior__grid-cell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.72);
+    opacity: 0;
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    will-change: opacity;
   }
 
   .fullscreen-interior__grid.is-dissolving .fullscreen-interior__grid-cell {
     opacity: 1;
-    transform: scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
+    transition-delay: 0ms;
+  }
+
+  .fullscreen-interior__grid.is-dissolving .fullscreen-interior__grid-cell::after {
+    opacity: 1;
     transition-delay: var(--cell-delay, 0ms);
   }
 
   .fullscreen-interior__grid.is-dissolving.is-revealing .fullscreen-interior__grid-cell {
     opacity: 0;
-    transform: scale(0.98);
+    transform:
+      translate3d(
+        calc(var(--cell-dx, 0) * 1px),
+        calc(var(--cell-dy, 0) * 1px),
+        0
+      )
+      scale(0.94);
+    transition-delay: var(--cell-delay-rev, 0ms);
+  }
+
+  .fullscreen-interior__grid.is-dissolving.is-revealing .fullscreen-interior__grid-cell::after {
+    opacity: 0;
     transition-delay: var(--cell-delay-rev, 0ms);
   }
 
@@ -4657,7 +4723,7 @@
 
   /* =========================================================
      10. FULLSCREEN PROJECT BACKGROUND SLIDESHOW
-          (with diagonal wave grid dissolve transition)
+          (mosaic mirror dissolve with white wash + shatter)
      ========================================================= */
   (function initFullscreenProjects() {
     const container = document.getElementById('fullscreenProjects');
@@ -4693,6 +4759,10 @@
     const AUTO_INTERVAL = 6000;
     const PROGRESS_STEP = 50;
 
+    /* Grid geometry — kept in sync with CSS: 8 cols × 6 rows */
+    const COLS = 8;
+    const ROWS = 6;
+
     /* --- Build slides --- */
     projects.forEach((p, i) => {
       const slide = document.createElement('div');
@@ -4710,10 +4780,8 @@
       slideElements.push(slide);
     });
 
-    /* --- Build grid cells (diagonal wave dissolve) --- */
+    /* --- Build grid cells (mosaic + diagonal wave shatter + white wash) --- */
     if (gridEl) {
-      const COLS = 8;
-      const ROWS = 6;
       const STEP_MS = 18;       // base delay per diagonal step
       const WAVE_AMP_MS = 90;   // extra delay from the sine wave
       const WAVE_FREQ = 1.4;    // how many waves across the grid
@@ -4724,18 +4792,24 @@
           const cell = document.createElement('div');
           cell.className = 'fullscreen-projects__grid-cell';
 
-          // Diagonal position: top-left → bottom-right
+          // Diagonal position from top-left for the white wash in
           const diag = c + r;
-          const wave = Math.sin((diag / MAX_DIAG) * Math.PI * WAVE_FREQ);
-          const delayIn = Math.round(diag * STEP_MS + (wave + 1) * WAVE_AMP_MS);
+          const waveIn = Math.sin((diag / MAX_DIAG) * Math.PI * WAVE_FREQ);
+          const delayIn = Math.round(diag * STEP_MS + (waveIn + 1) * WAVE_AMP_MS);
 
-          // Reverse diagonal: bottom-right → top-left
+          // Diagonal position from bottom-right for the reveal-out
           const diagRev = (COLS - 1 - c) + (ROWS - 1 - r);
           const waveRev = Math.sin((diagRev / MAX_DIAG) * Math.PI * WAVE_FREQ);
           const delayOut = Math.round(diagRev * STEP_MS + (waveRev + 1) * WAVE_AMP_MS);
 
+          // Shatter drift: push each tile outward from grid centre as it fades
+          const dx = Math.round((c - (COLS - 1) / 2) * 1.6);
+          const dy = Math.round((r - (ROWS - 1) / 2) * 1.6);
+
           cell.style.setProperty('--cell-delay', delayIn + 'ms');
           cell.style.setProperty('--cell-delay-rev', delayOut + 'ms');
+          cell.style.setProperty('--cell-dx', dx);
+          cell.style.setProperty('--cell-dy', dy);
           gridEl.appendChild(cell);
         }
       }
@@ -4764,28 +4838,55 @@
       if (yearEl) yearEl.textContent = p.year;
     }
 
-    /* --- Grid dissolve transition --- */
+    /* --- Mosaic mirror: paint each cell with its slice of the outgoing image --- */
+    function mirrorGridToSlide(src) {
+      if (!gridEl) return;
+      const cells = gridEl.querySelectorAll('.fullscreen-projects__grid-cell');
+      if (!cells.length) return;
+
+      cells.forEach((cell, i) => {
+        const c = i % COLS;
+        const r = Math.floor(i / COLS);
+
+        // Position this cell's slice within the whole image
+        const posX = COLS > 1 ? (c / (COLS - 1)) * 100 : 50;
+        const posY = ROWS > 1 ? (r / (ROWS - 1)) * 100 : 50;
+
+        cell.style.backgroundImage = `url("${src}")`;
+        // Scale so the full image spans all columns/rows
+        cell.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
+        cell.style.backgroundPosition = `${posX}% ${posY}%`;
+      });
+    }
+
+    /* --- Mosaic dissolve: mirror current → white-wash in → swap → shatter out --- */
     function triggerDissolve(callback) {
       if (!gridEl || reduceMotion) {
         if (callback) callback();
         return;
       }
 
-      gridEl.classList.add('is-dissolving');
-      gridEl.classList.remove('is-revealing');
+      // 1. Mirror the outgoing image across the grid (looks identical to the slide)
+      mirrorGridToSlide(projects[currentIndex].src);
 
-      // After the grid fills, change slides and reveal
+      // 2. Snap grid + cells to full opacity. Now the mosaic is indistinguishable
+      //    from the underlying slide — then the white wash starts building in a
+      //    staggered diagonal wave across the tiles.
+      gridEl.classList.remove('is-revealing');
+      gridEl.classList.add('is-dissolving');
+
+      // 3. Let the white wash visibly build across the tiles, THEN swap the
+      //    underlying slide and shatter the tiles away.
       setTimeout(() => {
         if (callback) callback();
-        // Small delay then reveal
+
+        gridEl.classList.add('is-revealing');
+
+        // 4. Clean up after the longest possible reveal delay
         setTimeout(() => {
-          gridEl.classList.add('is-revealing');
-          // Clean up after reveal completes
-          setTimeout(() => {
-            gridEl.classList.remove('is-dissolving', 'is-revealing');
-          }, 900);
-        }, 80);
-      }, 600);
+          gridEl.classList.remove('is-dissolving', 'is-revealing');
+        }, 1300);
+      }, 900);
     }
 
     /* --- Navigate to a slide --- */
@@ -4925,7 +5026,7 @@
 
   /* =========================================================
      11. FULLSCREEN INTERIOR BACKGROUND SLIDESHOW
-          (Joud Coffee images with diagonal wave grid dissolve)
+          (mosaic mirror dissolve with white wash + shatter)
      ========================================================= */
   (function initFullscreenInterior() {
     const container = document.getElementById('fullscreenInterior');
@@ -4958,6 +5059,10 @@
     const AUTO_INTERVAL = 6000;
     const PROGRESS_STEP = 50;
 
+    /* Grid geometry — kept in sync with CSS: 8 cols × 6 rows */
+    const COLS = 8;
+    const ROWS = 6;
+
     /* --- Build slides --- */
     projects.forEach((p, i) => {
       const slide = document.createElement('div');
@@ -4975,10 +5080,8 @@
       slideElements.push(slide);
     });
 
-    /* --- Build grid cells (diagonal wave dissolve) --- */
+    /* --- Build grid cells (mosaic + diagonal wave shatter + white wash) --- */
     if (gridEl) {
-      const COLS = 8;
-      const ROWS = 6;
       const STEP_MS = 18;
       const WAVE_AMP_MS = 90;
       const WAVE_FREQ = 1.4;
@@ -4990,15 +5093,20 @@
           cell.className = 'fullscreen-interior__grid-cell';
 
           const diag = c + r;
-          const wave = Math.sin((diag / MAX_DIAG) * Math.PI * WAVE_FREQ);
-          const delayIn = Math.round(diag * STEP_MS + (wave + 1) * WAVE_AMP_MS);
+          const waveIn = Math.sin((diag / MAX_DIAG) * Math.PI * WAVE_FREQ);
+          const delayIn = Math.round(diag * STEP_MS + (waveIn + 1) * WAVE_AMP_MS);
 
           const diagRev = (COLS - 1 - c) + (ROWS - 1 - r);
           const waveRev = Math.sin((diagRev / MAX_DIAG) * Math.PI * WAVE_FREQ);
           const delayOut = Math.round(diagRev * STEP_MS + (waveRev + 1) * WAVE_AMP_MS);
 
+          const dx = Math.round((c - (COLS - 1) / 2) * 1.6);
+          const dy = Math.round((r - (ROWS - 1) / 2) * 1.6);
+
           cell.style.setProperty('--cell-delay', delayIn + 'ms');
           cell.style.setProperty('--cell-delay-rev', delayOut + 'ms');
+          cell.style.setProperty('--cell-dx', dx);
+          cell.style.setProperty('--cell-dy', dy);
           gridEl.appendChild(cell);
         }
       }
@@ -5027,25 +5135,44 @@
       if (yearEl) yearEl.textContent = p.year;
     }
 
-    /* --- Grid dissolve transition --- */
+    /* --- Mosaic mirror: paint each cell with its slice of the outgoing image --- */
+    function mirrorGridToSlide(src) {
+      if (!gridEl) return;
+      const cells = gridEl.querySelectorAll('.fullscreen-interior__grid-cell');
+      if (!cells.length) return;
+
+      cells.forEach((cell, i) => {
+        const c = i % COLS;
+        const r = Math.floor(i / COLS);
+
+        const posX = COLS > 1 ? (c / (COLS - 1)) * 100 : 50;
+        const posY = ROWS > 1 ? (r / (ROWS - 1)) * 100 : 50;
+
+        cell.style.backgroundImage = `url("${src}")`;
+        cell.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
+        cell.style.backgroundPosition = `${posX}% ${posY}%`;
+      });
+    }
+
+    /* --- Mosaic dissolve: mirror current → white-wash in → swap → shatter out --- */
     function triggerDissolve(callback) {
       if (!gridEl || reduceMotion) {
         if (callback) callback();
         return;
       }
 
-      gridEl.classList.add('is-dissolving');
+      mirrorGridToSlide(projects[currentIndex].src);
+
       gridEl.classList.remove('is-revealing');
+      gridEl.classList.add('is-dissolving');
 
       setTimeout(() => {
         if (callback) callback();
+        gridEl.classList.add('is-revealing');
         setTimeout(() => {
-          gridEl.classList.add('is-revealing');
-          setTimeout(() => {
-            gridEl.classList.remove('is-dissolving', 'is-revealing');
-          }, 900);
-        }, 80);
-      }, 600);
+          gridEl.classList.remove('is-dissolving', 'is-revealing');
+        }, 1300);
+      }, 900);
     }
 
     /* --- Navigate to a slide --- */
