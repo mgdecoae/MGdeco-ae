@@ -1096,7 +1096,9 @@
     transform: scale(1);
   }
 
-  /* Mosaic grid overlay — each cell mirrors a slice of the current image */
+  /* Mosaic grid overlay — cells mirror slices of the current image.
+     grid-template-columns / rows are set dynamically by JS to keep tiles
+     roughly square. The 8 / 6 fallback below only applies pre-init. */
   .fullscreen-projects__grid {
     position: absolute;
     inset: 0;
@@ -1153,7 +1155,6 @@
 
   .fullscreen-projects__grid.is-dissolving.is-revealing .fullscreen-projects__grid-cell {
     opacity: 0;
-    /* Shatter: slight scale-down + drift in the direction of the diagonal wave */
     transform:
       translate3d(
         calc(var(--cell-dx, 0) * 1px),
@@ -1359,10 +1360,6 @@
   }
 
   @media (max-width: 760px) {
-    .fullscreen-projects__grid {
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(6, 1fr);
-    }
     .fullscreen-projects__overlay {
       padding-bottom: 2rem;
     }
@@ -1387,13 +1384,6 @@
       width: 40px;
       height: 40px;
       font-size: 0.95rem;
-    }
-  }
-
-  @media (max-width: 400px) {
-    .fullscreen-projects__grid {
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(6, 1fr);
     }
   }
 
@@ -1445,7 +1435,7 @@
     transform: scale(1);
   }
 
-  /* Mosaic grid overlay — each cell mirrors a slice of the current image */
+  /* Mosaic grid overlay — cells mirror slices of the current image */
   .fullscreen-interior__grid {
     position: absolute;
     inset: 0;
@@ -1476,7 +1466,6 @@
     pointer-events: none;
   }
 
-  /* Translucent white wash over each tile */
   .fullscreen-interior__grid-cell::after {
     content: "";
     position: absolute;
@@ -1706,10 +1695,6 @@
   }
 
   @media (max-width: 760px) {
-    .fullscreen-interior__grid {
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(6, 1fr);
-    }
     .fullscreen-interior__overlay {
       padding-bottom: 2rem;
     }
@@ -1734,13 +1719,6 @@
       width: 40px;
       height: 40px;
       font-size: 0.95rem;
-    }
-  }
-
-  @media (max-width: 400px) {
-    .fullscreen-interior__grid {
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(6, 1fr);
     }
   }
 
@@ -2671,10 +2649,6 @@
     }
     .overlay-close { width: 44px; height: 44px; }
 
-    .fullscreen-projects__grid {
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(6, 1fr);
-    }
     .fullscreen-projects__overlay {
       padding-bottom: 2rem;
     }
@@ -2701,10 +2675,6 @@
       font-size: 0.95rem;
     }
 
-    .fullscreen-interior__grid {
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(6, 1fr);
-    }
     .fullscreen-interior__overlay {
       padding-bottom: 2rem;
     }
@@ -2738,14 +2708,6 @@
     .hero__logo { width: 48px; }
     .idv__index .idx-label { font-size: 1rem; }
     .magazine__section-title { font-size: 1.35rem; }
-    .fullscreen-projects__grid {
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(6, 1fr);
-    }
-    .fullscreen-interior__grid {
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(6, 1fr);
-    }
   }
 
   @media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
@@ -4723,7 +4685,7 @@
 
   /* =========================================================
      10. FULLSCREEN PROJECT BACKGROUND SLIDESHOW
-          (mosaic mirror dissolve with white wash + shatter)
+          (dynamic mosaic mirror dissolve — current image tiles away)
      ========================================================= */
   (function initFullscreenProjects() {
     const container = document.getElementById('fullscreenProjects');
@@ -4759,9 +4721,27 @@
     const AUTO_INTERVAL = 6000;
     const PROGRESS_STEP = 50;
 
-    /* Grid geometry — kept in sync with CSS: 8 cols × 6 rows */
-    const COLS = 8;
-    const ROWS = 6;
+    /* --- Dynamic grid geometry ---------------------------------
+       Tiles are kept roughly square by deriving COLS/ROWS from the
+       container's aspect ratio and a target tile size. Recomputed on
+       resize. The mosaic mirror, wave delays and shatter offsets all
+       read from these live values. */
+    let COLS = 8;
+    let ROWS = 6;
+    const TARGET_TILE = 140; // px — approximate tile size (both axes)
+
+    function computeGridDims() {
+      const w = container.clientWidth || window.innerWidth || 1;
+      const h = container.clientHeight || window.innerHeight || 1;
+
+      // Aim for ~TARGET_TILE px tiles, clamped to sensible bounds.
+      COLS = Math.max(6, Math.min(16, Math.round(w / TARGET_TILE)));
+      ROWS = Math.max(4, Math.min(12, Math.round(h / TARGET_TILE)));
+
+      // Safety: at least 1 of each
+      if (COLS < 1) COLS = 1;
+      if (ROWS < 1) ROWS = 1;
+    }
 
     /* --- Build slides --- */
     projects.forEach((p, i) => {
@@ -4780,12 +4760,26 @@
       slideElements.push(slide);
     });
 
-    /* --- Build grid cells (mosaic + diagonal wave shatter + white wash) --- */
-    if (gridEl) {
+    /* --- Grid build / rebuild (fully dynamic on resize) ---
+       Rebuilds the grid overlay to match the current COLS × ROWS, updates
+       the CSS grid-template, and recomputes every cell's diagonal wave
+       delay + shatter drift. Called once on init and again on resize. */
+    function buildGrid() {
+      if (!gridEl) return;
+
+      computeGridDims();
+
+      // Update the CSS grid to match the live column / row counts
+      gridEl.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+      gridEl.style.gridTemplateRows = `repeat(${ROWS}, 1fr)`;
+
+      // Wipe and rebuild cells
+      gridEl.innerHTML = '';
+
       const STEP_MS = 18;       // base delay per diagonal step
       const WAVE_AMP_MS = 90;   // extra delay from the sine wave
       const WAVE_FREQ = 1.4;    // how many waves across the grid
-      const MAX_DIAG = (COLS - 1) + (ROWS - 1);
+      const MAX_DIAG = Math.max(1, (COLS - 1) + (ROWS - 1));
 
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -4815,6 +4809,19 @@
       }
     }
 
+    // Initial build
+    buildGrid();
+
+    // Rebuild on resize (debounced) so tiles stay roughly square
+    let gridResizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(gridResizeTimer);
+      gridResizeTimer = setTimeout(() => {
+        // Skip rebuild while a dissolve is mid-flight to avoid glitches
+        if (!isTransitioning) buildGrid();
+      }, 180);
+    }, { passive: true });
+
     /* --- Build dots --- */
     if (dotsContainer) {
       projects.forEach((_, i) => {
@@ -4838,7 +4845,8 @@
       if (yearEl) yearEl.textContent = p.year;
     }
 
-    /* --- Mosaic mirror: paint each cell with its slice of the outgoing image --- */
+    /* --- Mosaic mirror: paint each cell with its slice of the outgoing image ---
+       Reads the *live* COLS/ROWS so it stays correct after a resize. */
     function mirrorGridToSlide(src) {
       if (!gridEl) return;
       const cells = gridEl.querySelectorAll('.fullscreen-projects__grid-cell');
@@ -5026,7 +5034,7 @@
 
   /* =========================================================
      11. FULLSCREEN INTERIOR BACKGROUND SLIDESHOW
-          (mosaic mirror dissolve with white wash + shatter)
+          (dynamic mosaic mirror dissolve — current image tiles away)
      ========================================================= */
   (function initFullscreenInterior() {
     const container = document.getElementById('fullscreenInterior');
@@ -5059,9 +5067,21 @@
     const AUTO_INTERVAL = 6000;
     const PROGRESS_STEP = 50;
 
-    /* Grid geometry — kept in sync with CSS: 8 cols × 6 rows */
-    const COLS = 8;
-    const ROWS = 6;
+    /* --- Dynamic grid geometry --- */
+    let COLS = 8;
+    let ROWS = 6;
+    const TARGET_TILE = 140;
+
+    function computeGridDims() {
+      const w = container.clientWidth || window.innerWidth || 1;
+      const h = container.clientHeight || window.innerHeight || 1;
+
+      COLS = Math.max(6, Math.min(16, Math.round(w / TARGET_TILE)));
+      ROWS = Math.max(4, Math.min(12, Math.round(h / TARGET_TILE)));
+
+      if (COLS < 1) COLS = 1;
+      if (ROWS < 1) ROWS = 1;
+    }
 
     /* --- Build slides --- */
     projects.forEach((p, i) => {
@@ -5080,12 +5100,21 @@
       slideElements.push(slide);
     });
 
-    /* --- Build grid cells (mosaic + diagonal wave shatter + white wash) --- */
-    if (gridEl) {
+    /* --- Grid build / rebuild (fully dynamic on resize) --- */
+    function buildGrid() {
+      if (!gridEl) return;
+
+      computeGridDims();
+
+      gridEl.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+      gridEl.style.gridTemplateRows = `repeat(${ROWS}, 1fr)`;
+
+      gridEl.innerHTML = '';
+
       const STEP_MS = 18;
       const WAVE_AMP_MS = 90;
       const WAVE_FREQ = 1.4;
-      const MAX_DIAG = (COLS - 1) + (ROWS - 1);
+      const MAX_DIAG = Math.max(1, (COLS - 1) + (ROWS - 1));
 
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -5111,6 +5140,16 @@
         }
       }
     }
+
+    buildGrid();
+
+    let gridResizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(gridResizeTimer);
+      gridResizeTimer = setTimeout(() => {
+        if (!isTransitioning) buildGrid();
+      }, 180);
+    }, { passive: true });
 
     /* --- Build dots --- */
     if (dotsContainer) {
