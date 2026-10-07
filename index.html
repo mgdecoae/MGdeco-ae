@@ -5050,13 +5050,50 @@
 
     if (!container || !bgStack) return;
 
-    /* Interior project data — Joud Coffee images from the carousel */
-    const projects = carouselSources.map((src) => ({
-      title: 'Joud Coffee',
-      category: 'Interiors',
-      year: '2023',
-      src
-    }));
+    /* Interior projects — each with its own image gallery */
+    const interiorProjects = [
+      {
+        title: 'Joud Coffee',
+        category: 'Interiors',
+        year: '2023',
+        images: [
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp'
+        ]
+      },
+      {
+        title: 'Al Saif Tower',
+        category: 'Interiors',
+        year: '2024',
+        images: [
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA1.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA2.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA3.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA4.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA5.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA6.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA7.webp',
+          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA8.webp'
+        ]
+      }
+    ];
+
+    /* Flatten into a single slide list — each slide carries its project meta */
+    const projects = [];
+    interiorProjects.forEach((proj) => {
+      proj.images.forEach((src) => {
+        projects.push({
+          title: proj.title,
+          category: proj.category,
+          year: proj.year,
+          src
+        });
+      });
+    });
 
     let currentIndex = 0;
     let slideElements = [];
