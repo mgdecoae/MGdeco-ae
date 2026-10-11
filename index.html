@@ -4893,6 +4893,8 @@
   /* =========================================================
      10. FULLSCREEN PROJECT BACKGROUND SLIDESHOW
           (simple cross-fade — no mosaic dissolve)
+          Deferred until it's close to the viewport so we never
+          spawn heavy filtered images on page load.
      ========================================================= */
   (function initFullscreenProjects() {
     const container = document.getElementById('fullscreenProjects');
@@ -4907,192 +4909,227 @@
 
     if (!container || !bgStack) return;
 
-    /* Project data — matched to the original selected work grid */
-    const projects = [
-      { title: 'Harbour Point', category: 'Mixed-use', year: '2024', src: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=2400&q=85' },
-      { title: 'Villa Norr', category: 'Residential', year: '2023', src: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=2400&q=85' },
-      { title: 'The Atrium', category: 'Workplace', year: '2024', src: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=2400&q=85' },
-      { title: 'Civic Hall', category: 'Cultural', year: '2022', src: 'https://images.unsplash.com/photo-1470723710355-95304d8aece4?auto=format&fit=crop&w=2400&q=85' },
-      { title: 'Pavilion 09', category: 'Public', year: '2023', src: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=2400&q=85' },
-      { title: 'Line House', category: 'Interiors', year: '2024', src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=85' },
-      { title: 'North Quarter', category: 'Masterplan', year: '2025', src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2400&q=85' }
-    ];
+    let started = false;
+    const deferredObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !started) {
+            started = true;
+            deferredObserver.disconnect();
+            start();
+          }
+        });
+      },
+      { rootMargin: '400px 0px', threshold: 0 }
+    );
+    deferredObserver.observe(container);
 
-    let currentIndex = 0;
-    let slideElements = [];
-    let dotElements = [];
-    let autoTimer = null;
-    let progressInterval = null;
-    const AUTO_INTERVAL = 6000;
-    const PROGRESS_STEP = 50;
+    function start() {
+      /* Project data — matched to the original selected work grid */
+      const projects = [
+        { title: 'Harbour Point', category: 'Mixed-use', year: '2024', src: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=2400&q=85' },
+        { title: 'Villa Norr', category: 'Residential', year: '2023', src: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=2400&q=85' },
+        { title: 'The Atrium', category: 'Workplace', year: '2024', src: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=2400&q=85' },
+        { title: 'Civic Hall', category: 'Cultural', year: '2022', src: 'https://images.unsplash.com/photo-1470723710355-95304d8aece4?auto=format&fit=crop&w=2400&q=85' },
+        { title: 'Pavilion 09', category: 'Public', year: '2023', src: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=2400&q=85' },
+        { title: 'Line House', category: 'Interiors', year: '2024', src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=85' },
+        { title: 'North Quarter', category: 'Masterplan', year: '2025', src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2400&q=85' }
+      ];
 
-    /* --- Build slides --- */
-    projects.forEach((p, i) => {
-      const slide = document.createElement('div');
-      slide.className = 'fullscreen-projects__slide' + (i === 0 ? ' is-active' : '');
-      slide.dataset.index = i;
+      let currentIndex = 0;
+      let slideElements = [];
+      let dotElements = [];
+      let autoTimer = null;
+      let progressInterval = null;
+      const AUTO_INTERVAL = 6000;
+      const PROGRESS_STEP = 50;
 
-      const img = document.createElement('img');
-      img.src = p.src;
-      img.alt = p.title + ' — ' + p.category;
-      img.loading = i === 0 ? 'eager' : 'lazy';
-      img.decoding = 'async';
-      if (i === 0) img.fetchPriority = 'high';
-      slide.appendChild(img);
-      bgStack.appendChild(slide);
-      slideElements.push(slide);
-    });
+      /* --- Build slides --- */
+      projects.forEach((p, i) => {
+        const slide = document.createElement('div');
+        slide.className = 'fullscreen-projects__slide' + (i === 0 ? ' is-active' : '');
+        slide.dataset.index = i;
 
-    /* --- Build dots --- */
-    if (dotsContainer) {
-      projects.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.className = 'fullscreen-projects__dot' + (i === 0 ? ' is-active' : '');
-        dot.type = 'button';
-        dot.setAttribute('role', 'tab');
-        dot.setAttribute('aria-label', `Show project ${i + 1}: ${projects[i].title}`);
-        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-        dot.addEventListener('click', () => goTo(i, true));
-        dotsContainer.appendChild(dot);
-        dotElements.push(dot);
+        const img = document.createElement('img');
+        img.src = p.src;
+        img.alt = p.title + ' — ' + p.category;
+        img.loading = i === 0 ? 'eager' : 'lazy';
+        img.decoding = 'async';
+        if (i === 0) img.fetchPriority = 'high';
+        slide.appendChild(img);
+        bgStack.appendChild(slide);
+        slideElements.push(slide);
       });
-    }
 
-    /* --- Update meta --- */
-    function updateMeta() {
-      const p = projects[currentIndex];
-      if (titleEl) titleEl.textContent = p.title;
-      if (categoryEl) categoryEl.textContent = p.category;
-      if (yearEl) yearEl.textContent = p.year;
-    }
-
-    /* --- Navigate to a slide (simple cross-fade, no mosaic) --- */
-    function goTo(index, userInitiated = false) {
-      let nextIndex = index;
-      if (nextIndex < 0) nextIndex = slideElements.length - 1;
-      if (nextIndex >= slideElements.length) nextIndex = 0;
-
-      if (nextIndex === currentIndex) {
-        if (userInitiated) restartAutoTimer();
-        return;
+      /* --- Build dots --- */
+      if (dotsContainer) {
+        projects.forEach((_, i) => {
+          const dot = document.createElement('button');
+          dot.className = 'fullscreen-projects__dot' + (i === 0 ? ' is-active' : '');
+          dot.type = 'button';
+          dot.setAttribute('role', 'tab');
+          dot.setAttribute('aria-label', `Show project ${i + 1}: ${projects[i].title}`);
+          dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+          dot.addEventListener('click', () => goTo(i, true));
+          dotsContainer.appendChild(dot);
+          dotElements.push(dot);
+        });
       }
 
-      // Update dots immediately for responsiveness
-      dotElements.forEach((d, i) => {
-        d.classList.toggle('is-active', i === nextIndex);
-        d.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
+      /* --- Update meta --- */
+      function updateMeta() {
+        const p = projects[currentIndex];
+        if (titleEl) titleEl.textContent = p.title;
+        if (categoryEl) categoryEl.textContent = p.category;
+        if (yearEl) yearEl.textContent = p.year;
+      }
+
+      /* --- Navigate to a slide (simple cross-fade, no mosaic) --- */
+      function goTo(index, userInitiated = false) {
+        let nextIndex = index;
+        if (nextIndex < 0) nextIndex = slideElements.length - 1;
+        if (nextIndex >= slideElements.length) nextIndex = 0;
+
+        if (nextIndex === currentIndex) {
+          if (userInitiated) restartAutoTimer();
+          return;
+        }
+
+        // Update dots immediately for responsiveness
+        dotElements.forEach((d, i) => {
+          d.classList.toggle('is-active', i === nextIndex);
+          d.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
+        });
+
+        // Swap active slide (cross-fade handled by CSS opacity transition)
+        slideElements.forEach((s, i) => {
+          s.classList.toggle('is-active', i === nextIndex);
+        });
+        currentIndex = nextIndex;
+        updateMeta();
+        resetProgress();
+
+        if (userInitiated) restartAutoTimer();
+      }
+
+      function nextSlide() { goTo(currentIndex + 1); }
+      function prevSlide() { goTo(currentIndex - 1); }
+
+      /* --- Auto-advance timer --- */
+      function startAutoTimer() {
+        if (reduceMotion) return;
+        stopAutoTimer();
+        autoTimer = setInterval(nextSlide, AUTO_INTERVAL);
+        startProgress();
+      }
+
+      function stopAutoTimer() {
+        if (autoTimer) clearInterval(autoTimer);
+        autoTimer = null;
+        stopProgress();
+      }
+
+      function restartAutoTimer() {
+        stopAutoTimer();
+        startAutoTimer();
+      }
+
+      /* --- Progress bar --- */
+      let progressValue = 0;
+      function startProgress() {
+        stopProgress();
+        progressValue = 0;
+        if (progressBar) progressBar.style.width = '0%';
+        progressInterval = setInterval(() => {
+          progressValue += (PROGRESS_STEP / AUTO_INTERVAL) * 100;
+          if (progressValue >= 100) progressValue = 100;
+          if (progressBar) progressBar.style.width = progressValue + '%';
+        }, PROGRESS_STEP);
+      }
+
+      function stopProgress() {
+        if (progressInterval) clearInterval(progressInterval);
+        progressInterval = null;
+      }
+
+      function resetProgress() {
+        stopProgress();
+        progressValue = 0;
+        if (progressBar) progressBar.style.width = '0%';
+        if (autoTimer) startProgress();
+      }
+
+      /* --- Controls --- */
+      if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); restartAutoTimer(); });
+      if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); restartAutoTimer(); });
+
+      /* --- Pause on hover --- */
+      container.addEventListener('mouseenter', () => {
+        stopAutoTimer();
+        stopProgress();
+      });
+      container.addEventListener('mouseleave', () => {
+        if (!reduceMotion) {
+          startAutoTimer();
+        }
       });
 
-      // Swap active slide (cross-fade handled by CSS opacity transition)
-      slideElements.forEach((s, i) => {
-        s.classList.toggle('is-active', i === nextIndex);
+      /* --- Pause when tab is hidden --- */
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopAutoTimer();
+          stopProgress();
+        } else {
+          if (!reduceMotion) startAutoTimer();
+        }
       });
-      currentIndex = nextIndex;
+
+      /* --- Keyboard navigation --- */
+      container.setAttribute('tabindex', '0');
+      container.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); restartAutoTimer(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); restartAutoTimer(); }
+      });
+
+      /* --- Initialize --- */
       updateMeta();
-      resetProgress();
 
-      if (userInitiated) restartAutoTimer();
-    }
-
-    function nextSlide() { goTo(currentIndex + 1); }
-    function prevSlide() { goTo(currentIndex - 1); }
-
-    /* --- Auto-advance timer --- */
-    function startAutoTimer() {
-      if (reduceMotion) return;
-      stopAutoTimer();
-      autoTimer = setInterval(nextSlide, AUTO_INTERVAL);
-      startProgress();
-    }
-
-    function stopAutoTimer() {
-      if (autoTimer) clearInterval(autoTimer);
-      autoTimer = null;
-      stopProgress();
-    }
-
-    function restartAutoTimer() {
-      stopAutoTimer();
-      startAutoTimer();
-    }
-
-    /* --- Progress bar --- */
-    let progressValue = 0;
-    function startProgress() {
-      stopProgress();
-      progressValue = 0;
-      if (progressBar) progressBar.style.width = '0%';
-      progressInterval = setInterval(() => {
-        progressValue += (PROGRESS_STEP / AUTO_INTERVAL) * 100;
-        if (progressValue >= 100) progressValue = 100;
-        if (progressBar) progressBar.style.width = progressValue + '%';
-      }, PROGRESS_STEP);
-    }
-
-    function stopProgress() {
-      if (progressInterval) clearInterval(progressInterval);
-      progressInterval = null;
-    }
-
-    function resetProgress() {
-      stopProgress();
-      progressValue = 0;
-      if (progressBar) progressBar.style.width = '0%';
-      if (autoTimer) startProgress();
-    }
-
-    /* --- Controls --- */
-    if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); restartAutoTimer(); });
-    if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); restartAutoTimer(); });
-
-    /* --- Pause on hover --- */
-    container.addEventListener('mouseenter', () => {
-      stopAutoTimer();
-      stopProgress();
-    });
-    container.addEventListener('mouseleave', () => {
       if (!reduceMotion) {
         startAutoTimer();
       }
-    });
 
-    /* --- Pause when tab is hidden --- */
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        stopAutoTimer();
-        stopProgress();
-      } else {
-        if (!reduceMotion) startAutoTimer();
+      /* Preload the next slide once (no runaway interval).
+         The interval is cleared whenever the tab is hidden. */
+      let preloadTimer = null;
+      function preloadNext() {
+        const nextIdx = (currentIndex + 1) % projects.length;
+        const img = new Image();
+        img.src = projects[nextIdx].src;
       }
-    });
-
-    /* --- Keyboard navigation --- */
-    container.setAttribute('tabindex', '0');
-    container.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); restartAutoTimer(); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); restartAutoTimer(); }
-    });
-
-    /* --- Initialize --- */
-    updateMeta();
-
-    if (!reduceMotion) {
-      startAutoTimer();
+      preloadNext();
+      preloadTimer = setInterval(() => {
+        if (!document.hidden) preloadNext();
+      }, 10000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (preloadTimer) { clearInterval(preloadTimer); preloadTimer = null; }
+        } else if (!preloadTimer) {
+          preloadTimer = setInterval(() => {
+            if (!document.hidden) preloadNext();
+          }, 10000);
+        }
+      });
     }
-
-    // Preload next image for smoother transition
-    function preloadNext() {
-      const nextIdx = (currentIndex + 1) % projects.length;
-      const img = new Image();
-      img.src = projects[nextIdx].src;
-    }
-    preloadNext();
-    setInterval(preloadNext, 10000);
   })();
 
   /* =========================================================
      11. FULLSCREEN INTERIOR BACKGROUND SLIDESHOW
           (simple cross-fade — no mosaic dissolve)
+
+          Deferred until it's close to the viewport, and images
+          are only materialised just-in-time. Previously all 14
+          filtered <img> elements were created on page load,
+          which overloaded the compositor and crashed the tab.
      ========================================================= */
   (function initFullscreenInterior() {
     const container = document.getElementById('fullscreenInterior');
@@ -5107,221 +5144,278 @@
 
     if (!container || !bgStack) return;
 
-    /* Interior projects — each with its own image gallery */
-    const interiorProjects = [
-      {
-        title: 'Joud Coffee',
-        category: 'Interiors',
-        year: '2023',
-        images: [
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp'
-        ]
+    /* Defer the whole slideshow until it's close to the viewport. */
+    let started = false;
+    const deferredObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !started) {
+            started = true;
+            deferredObserver.disconnect();
+            start();
+          }
+        });
       },
-      {
-        title: 'Al Saif Tower',
-        category: 'Interiors',
-        year: '2024',
-        images: [
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA1.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA2.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA3.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA4.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA5.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA6.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA7.webp',
-          'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA8.webp'
-        ]
-      }
-    ];
+      { rootMargin: '400px 0px', threshold: 0 }
+    );
+    deferredObserver.observe(container);
 
-    /* Flatten into a single slide list — each slide carries its project meta */
-    const projects = [];
-    interiorProjects.forEach((proj) => {
-      proj.images.forEach((src) => {
-        projects.push({
-          title: proj.title,
-          category: proj.category,
-          year: proj.year,
-          src
+    function start() {
+      /* Interior projects — each with its own image gallery */
+      const interiorProjects = [
+        {
+          title: 'Joud Coffee',
+          category: 'Interiors',
+          year: '2023',
+          images: [
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp'
+          ]
+        },
+        {
+          title: 'Al Saif Tower',
+          category: 'Interiors',
+          year: '2024',
+          images: [
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA1.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA2.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA3.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA4.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA5.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA6.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA7.webp',
+            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA8.webp'
+          ]
+        }
+      ];
+
+      /* Flatten into a single slide list — each slide carries its project meta */
+      const projects = [];
+      interiorProjects.forEach((proj) => {
+        proj.images.forEach((src) => {
+          projects.push({
+            title: proj.title,
+            category: proj.category,
+            year: proj.year,
+            src
+          });
         });
       });
-    });
 
-    let currentIndex = 0;
-    let slideElements = [];
-    let dotElements = [];
-    let autoTimer = null;
-    let progressInterval = null;
-    const AUTO_INTERVAL = 6000;
-    const PROGRESS_STEP = 50;
+      let currentIndex = 0;
+      let slideElements = [];
+      let dotElements = [];
+      let autoTimer = null;
+      let progressInterval = null;
+      const AUTO_INTERVAL = 6000;
+      const PROGRESS_STEP = 50;
 
-    /* --- Build slides --- */
-    projects.forEach((p, i) => {
-      const slide = document.createElement('div');
-      slide.className = 'fullscreen-interior__slide' + (i === 0 ? ' is-active' : '');
-      slide.dataset.index = i;
+      /* --- Build slides ---
+         Only the first slide's <img> is created eagerly. The rest are
+         created on demand when the slideshow scrolls into view, which
+         avoids spawning 14 heavy filtered images at page load. */
+      projects.forEach((p, i) => {
+        const slide = document.createElement('div');
+        slide.className = 'fullscreen-interior__slide' + (i === 0 ? ' is-active' : '');
+        slide.dataset.index = i;
 
-      const img = document.createElement('img');
-      img.src = p.src;
-      img.alt = p.title + ' — ' + p.category + ' interior';
-      img.loading = i === 0 ? 'eager' : 'lazy';
-      img.decoding = 'async';
-      if (i === 0) img.fetchPriority = 'high';
-      slide.appendChild(img);
-      bgStack.appendChild(slide);
-      slideElements.push(slide);
-    });
+        if (i === 0) {
+          const img = document.createElement('img');
+          img.src = p.src;
+          img.alt = p.title + ' — ' + p.category + ' interior';
+          img.loading = 'eager';
+          img.decoding = 'async';
+          img.fetchPriority = 'high';
+          slide.appendChild(img);
+        } else {
+          slide.dataset.src = p.src;
+          slide.dataset.alt = p.title + ' — ' + p.category + ' interior';
+        }
 
-    /* --- Build dots --- */
-    if (dotsContainer) {
-      projects.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.className = 'fullscreen-interior__dot' + (i === 0 ? ' is-active' : '');
-        dot.type = 'button';
-        dot.setAttribute('role', 'tab');
-        dot.setAttribute('aria-label', `Show interior image ${i + 1}`);
-        dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-        dot.addEventListener('click', () => goTo(i, true));
-        dotsContainer.appendChild(dot);
-        dotElements.push(dot);
+        bgStack.appendChild(slide);
+        slideElements.push(slide);
       });
-    }
 
-    /* --- Update meta --- */
-    function updateMeta() {
-      const p = projects[currentIndex];
-      if (titleEl) titleEl.textContent = p.title;
-      if (categoryEl) categoryEl.textContent = p.category;
-      if (yearEl) yearEl.textContent = p.year;
-    }
-
-    /* --- Navigate to a slide (simple cross-fade, no mosaic) --- */
-    function goTo(index, userInitiated = false) {
-      let nextIndex = index;
-      if (nextIndex < 0) nextIndex = slideElements.length - 1;
-      if (nextIndex >= slideElements.length) nextIndex = 0;
-
-      if (nextIndex === currentIndex) {
-        if (userInitiated) restartAutoTimer();
-        return;
+      /* Materialise a slide's <img> the first time it's needed. */
+      function ensureSlideImage(index) {
+        const slide = slideElements[index];
+        if (!slide || slide.querySelector('img')) return;
+        const src = slide.dataset.src;
+        if (!src) return;
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = slide.dataset.alt || '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        slide.appendChild(img);
       }
 
-      // Update dots immediately for responsiveness
-      dotElements.forEach((d, i) => {
-        d.classList.toggle('is-active', i === nextIndex);
-        d.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
+      /* --- Build dots --- */
+      if (dotsContainer) {
+        projects.forEach((_, i) => {
+          const dot = document.createElement('button');
+          dot.className = 'fullscreen-interior__dot' + (i === 0 ? ' is-active' : '');
+          dot.type = 'button';
+          dot.setAttribute('role', 'tab');
+          dot.setAttribute('aria-label', `Show interior image ${i + 1}`);
+          dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+          dot.addEventListener('click', () => goTo(i, true));
+          dotsContainer.appendChild(dot);
+          dotElements.push(dot);
+        });
+      }
+
+      /* --- Update meta --- */
+      function updateMeta() {
+        const p = projects[currentIndex];
+        if (titleEl) titleEl.textContent = p.title;
+        if (categoryEl) categoryEl.textContent = p.category;
+        if (yearEl) yearEl.textContent = p.year;
+      }
+
+      /* --- Navigate to a slide (simple cross-fade, no mosaic) --- */
+      function goTo(index, userInitiated = false) {
+        let nextIndex = index;
+        if (nextIndex < 0) nextIndex = slideElements.length - 1;
+        if (nextIndex >= slideElements.length) nextIndex = 0;
+
+        if (nextIndex === currentIndex) {
+          if (userInitiated) restartAutoTimer();
+          return;
+        }
+
+        // Materialise the slide we're about to show (and the one after).
+        ensureSlideImage(nextIndex);
+        ensureSlideImage((nextIndex + 1) % slideElements.length);
+
+        // Update dots immediately for responsiveness
+        dotElements.forEach((d, i) => {
+          d.classList.toggle('is-active', i === nextIndex);
+          d.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
+        });
+
+        // Swap active slide (cross-fade handled by CSS opacity transition)
+        slideElements.forEach((s, i) => {
+          s.classList.toggle('is-active', i === nextIndex);
+        });
+        currentIndex = nextIndex;
+        updateMeta();
+        resetProgress();
+
+        if (userInitiated) restartAutoTimer();
+      }
+
+      function nextSlide() { goTo(currentIndex + 1); }
+      function prevSlide() { goTo(currentIndex - 1); }
+
+      /* --- Auto-advance timer --- */
+      function startAutoTimer() {
+        if (reduceMotion) return;
+        stopAutoTimer();
+        autoTimer = setInterval(nextSlide, AUTO_INTERVAL);
+        startProgress();
+      }
+
+      function stopAutoTimer() {
+        if (autoTimer) clearInterval(autoTimer);
+        autoTimer = null;
+        stopProgress();
+      }
+
+      function restartAutoTimer() {
+        stopAutoTimer();
+        startAutoTimer();
+      }
+
+      /* --- Progress bar --- */
+      let progressValue = 0;
+      function startProgress() {
+        stopProgress();
+        progressValue = 0;
+        if (progressBar) progressBar.style.width = '0%';
+        progressInterval = setInterval(() => {
+          progressValue += (PROGRESS_STEP / AUTO_INTERVAL) * 100;
+          if (progressValue >= 100) progressValue = 100;
+          if (progressBar) progressBar.style.width = progressValue + '%';
+        }, PROGRESS_STEP);
+      }
+
+      function stopProgress() {
+        if (progressInterval) clearInterval(progressInterval);
+        progressInterval = null;
+      }
+
+      function resetProgress() {
+        stopProgress();
+        progressValue = 0;
+        if (progressBar) progressBar.style.width = '0%';
+        if (autoTimer) startProgress();
+      }
+
+      /* --- Controls --- */
+      if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); restartAutoTimer(); });
+      if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); restartAutoTimer(); });
+
+      /* --- Pause on hover --- */
+      container.addEventListener('mouseenter', () => {
+        stopAutoTimer();
+        stopProgress();
+      });
+      container.addEventListener('mouseleave', () => {
+        if (!reduceMotion) {
+          startAutoTimer();
+        }
       });
 
-      // Swap active slide (cross-fade handled by CSS opacity transition)
-      slideElements.forEach((s, i) => {
-        s.classList.toggle('is-active', i === nextIndex);
+      /* --- Pause when tab is hidden --- */
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopAutoTimer();
+          stopProgress();
+        } else {
+          if (!reduceMotion) startAutoTimer();
+        }
       });
-      currentIndex = nextIndex;
+
+      /* --- Keyboard navigation --- */
+      container.setAttribute('tabindex', '0');
+      container.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); restartAutoTimer(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); restartAutoTimer(); }
+      });
+
+      /* --- Initialize --- */
       updateMeta();
-      resetProgress();
 
-      if (userInitiated) restartAutoTimer();
-    }
-
-    function nextSlide() { goTo(currentIndex + 1); }
-    function prevSlide() { goTo(currentIndex - 1); }
-
-    /* --- Auto-advance timer --- */
-    function startAutoTimer() {
-      if (reduceMotion) return;
-      stopAutoTimer();
-      autoTimer = setInterval(nextSlide, AUTO_INTERVAL);
-      startProgress();
-    }
-
-    function stopAutoTimer() {
-      if (autoTimer) clearInterval(autoTimer);
-      autoTimer = null;
-      stopProgress();
-    }
-
-    function restartAutoTimer() {
-      stopAutoTimer();
-      startAutoTimer();
-    }
-
-    /* --- Progress bar --- */
-    let progressValue = 0;
-    function startProgress() {
-      stopProgress();
-      progressValue = 0;
-      if (progressBar) progressBar.style.width = '0%';
-      progressInterval = setInterval(() => {
-        progressValue += (PROGRESS_STEP / AUTO_INTERVAL) * 100;
-        if (progressValue >= 100) progressValue = 100;
-        if (progressBar) progressBar.style.width = progressValue + '%';
-      }, PROGRESS_STEP);
-    }
-
-    function stopProgress() {
-      if (progressInterval) clearInterval(progressInterval);
-      progressInterval = null;
-    }
-
-    function resetProgress() {
-      stopProgress();
-      progressValue = 0;
-      if (progressBar) progressBar.style.width = '0%';
-      if (autoTimer) startProgress();
-    }
-
-    /* --- Controls --- */
-    if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); restartAutoTimer(); });
-    if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); restartAutoTimer(); });
-
-    /* --- Pause on hover --- */
-    container.addEventListener('mouseenter', () => {
-      stopAutoTimer();
-      stopProgress();
-    });
-    container.addEventListener('mouseleave', () => {
       if (!reduceMotion) {
         startAutoTimer();
       }
-    });
 
-    /* --- Pause when tab is hidden --- */
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        stopAutoTimer();
-        stopProgress();
-      } else {
-        if (!reduceMotion) startAutoTimer();
+      /* Preload the next slide once (no runaway interval).
+         The interval is cleared whenever the tab is hidden. */
+      let preloadTimer = null;
+      function preloadNext() {
+        const nextIdx = (currentIndex + 1) % projects.length;
+        ensureSlideImage(nextIdx);
       }
-    });
-
-    /* --- Keyboard navigation --- */
-    container.setAttribute('tabindex', '0');
-    container.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); restartAutoTimer(); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); restartAutoTimer(); }
-    });
-
-    /* --- Initialize --- */
-    updateMeta();
-
-    if (!reduceMotion) {
-      startAutoTimer();
+      preloadNext();
+      preloadTimer = setInterval(() => {
+        if (!document.hidden) preloadNext();
+      }, 10000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (preloadTimer) { clearInterval(preloadTimer); preloadTimer = null; }
+        } else if (!preloadTimer) {
+          preloadTimer = setInterval(() => {
+            if (!document.hidden) preloadNext();
+          }, 10000);
+        }
+      });
     }
-
-    // Preload next image for smoother transition
-    function preloadNext() {
-      const nextIdx = (currentIndex + 1) % projects.length;
-      const img = new Image();
-      img.src = projects[nextIdx].src;
-    }
-    preloadNext();
-    setInterval(preloadNext, 10000);
   })();
 
 })();
