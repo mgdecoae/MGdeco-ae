@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#f4f1ec" />
-<title>MG Design Engineering — Architecture, Design & Strategy</title>
+<title>MGDECO Design Engineering Consultancy — Architecture, Design & Strategy</title>
 <!-- Speed up CDN image delivery -->
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -75,18 +75,28 @@
     transition: width 0.1s linear;
   }
 
-  /* ---------- Header ---------- */
+  /* ---------- Header — Apple-style glass ---------- */
   header {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 50;
-    background: rgba(244, 241, 236, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
-    transition: background 0.3s ease;
+    background: rgba(244, 241, 236, 0.62);
+    backdrop-filter: saturate(180%) blur(22px);
+    -webkit-backdrop-filter: saturate(180%) blur(22px);
+    border-bottom: 1px solid rgba(217, 211, 202, 0.55);
+    transition: background 0.4s var(--ease), border-color 0.4s var(--ease);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset;
   }
-  header.is-scrolled { background: rgba(244, 241, 236, 0.95); }
+  header.is-scrolled {
+    background: rgba(244, 241, 236, 0.78);
+    border-bottom-color: rgba(217, 211, 202, 0.8);
+  }
+
+  /* Fallback for browsers without backdrop-filter */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    header { background: rgba(244, 241, 236, 0.96); }
+    header.is-scrolled { background: rgba(244, 241, 236, 0.98); }
+  }
 
   .nav {
     display: flex;
@@ -95,12 +105,33 @@
     padding-block: 1.1rem;
   }
 
+  /* Text logo (used in footer) */
   .logo {
     font-family: Georgia, serif;
     font-size: 1.25rem;
     letter-spacing: 0.02em;
     cursor: pointer;
   }
+
+  /* Image logo (used in header) */
+  .logo--img {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    cursor: pointer;
+    line-height: 0;
+  }
+  .logo--img img {
+    display: block;
+    height: clamp(22px, 2.4vw, 30px);
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    /* The source asset is dark on transparent — no filter needed on paper. */
+    filter: none;
+    transition: opacity 0.3s var(--ease);
+  }
+  .logo--img:hover img { opacity: 0.75; }
 
   /* ---------- Nav dropdown (legacy — kept hidden; overlay menu is used instead) ---------- */
   .nav ul {
@@ -204,12 +235,12 @@
     padding-top: var(--header-h);
   }
 
-  /* ---------- Hero ---------- */
+  /* ---------- Hero — vertically centered content ---------- */
   .hero {
     position: relative;
     min-height: 88vh;
     display: flex;
-    align-items: flex-end;
+    align-items: center;         /* was flex-end → now vertically centered */
     color: #fff;
     overflow: hidden;
     margin-top: calc(-1 * var(--header-h));
@@ -230,7 +261,8 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    /* `background-attachment: fixed` removed — it forces a repaint
+       on every scroll frame and produced visible jitter. */
     filter: brightness(0.55);
     pointer-events: none;
   }
@@ -239,7 +271,6 @@
     position: absolute;
     inset: 0;
     overflow: hidden;
-    will-change: transform;
     background: transparent;
   }
 
@@ -290,6 +321,21 @@
     object-fit: contain;
   }
 
+  /* Brand logo sitting above the hero eyebrow */
+  .hero__brand {
+    display: block;
+    width: clamp(90px, 12vw, 170px);
+    height: auto;
+    object-fit: contain;
+    margin-bottom: clamp(1rem, 2.2vw, 1.75rem);
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 1s var(--ease-out) forwards;
+    animation-delay: 0s;
+    /* White-on-transparent asset — no filter needed over the darkened hero. */
+    filter: none;
+  }
+
   .hero__dots {
     position: absolute;
     left: var(--gutter);
@@ -327,14 +373,17 @@
 
   .hero__inner {
     position: relative;
-    padding-block: clamp(3rem, 8vw, 6rem);
+    /* Balanced padding — content sits visually centred in the
+       visible viewport (which starts just below the glass header). */
+    padding-block: calc(var(--header-h) + clamp(2rem, 5vw, 4rem)) clamp(3rem, 7vw, 5rem);
     max-width: 900px;
     z-index: 2;
   }
 
   @media (min-width: 761px) {
     .hero__inner {
-      padding-top: calc(var(--header-h) + clamp(3rem, 6vw, 5rem));
+      padding-top: calc(var(--header-h) + clamp(2.5rem, 5vw, 4.5rem));
+      padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
     }
   }
 
@@ -491,6 +540,145 @@
       padding-top: 0;
     }
     .intro__services       { grid-row: 4; }
+  }
+
+  /* =========================================================
+     SCROLL ACCORDION — OUR SERVICES
+
+     Items scroll naturally with the page (no sticky pinning).
+     Each row is tested against its own live top position:
+
+       • Expands when its top crosses 1/5 up from the viewport
+         bottom — i.e. rect.top <= 80% of viewport height.
+       • Collapses when its top crosses 1/5 down from the
+         viewport top — i.e. rect.top <= 20% of viewport height.
+       • Reverses naturally when scrolling back up.
+
+     Because nothing is pinned, once a row collapses it simply
+     continues moving up and out of view as normal — nothing
+     halts its motion.
+     ========================================================= */
+  .services {
+    position: relative;
+  }
+
+  .services li {
+    position: relative;
+    background: var(--paper);
+    border-bottom: none;
+    transition: box-shadow 0.6s var(--ease);
+  }
+
+  .services li + li { border-top: 1px solid var(--line); }
+  .services li:last-child { border-bottom: 1px solid var(--line); }
+
+  .services li.is-open {
+    box-shadow: 0 16px 26px -22px rgba(20, 17, 15, 0.55);
+  }
+
+  /* Last item keeps a clean edge — no shadow beneath it. */
+  .services li:last-child,
+  .services li:last-child.is-open {
+    box-shadow: none;
+  }
+
+  .services li .service__desc {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.75s var(--ease-out),
+      opacity 0.5s var(--ease-out);
+  }
+
+  .services li .service__desc > div {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .services li .service__desc p {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+    color: var(--muted);
+    max-width: 46ch;
+    padding: 0 3rem 0 0;
+    margin-bottom: 0.9rem;
+    transform: translateY(10px);
+    transition: transform 0.75s var(--ease-out);
+  }
+
+  .services li .service__desc .service__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.25rem;
+    margin: 0 0 0.4rem 0;
+    cursor: pointer;
+    background: none;
+    transform: translateY(10px);
+    transition:
+      transform 0.75s var(--ease-out),
+      gap 0.3s var(--ease),
+      color 0.3s var(--ease);
+  }
+
+  .services li .service__desc .service__more:hover,
+  .services li .service__desc .service__more:focus-visible {
+    gap: 0.75rem;
+    outline: none;
+  }
+
+  /* The single visual break that follows each "Explore more" link. */
+  .services li .service__desc > div > br {
+    display: block;
+    content: "";
+    height: 0.9em;
+  }
+
+  .services li.is-open .service__desc {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .services li.is-open .service__desc p,
+  .services li.is-open .service__desc .service__more {
+    transform: none;
+  }
+
+  .services li.is-open > a .arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (max-width: 760px) {
+    .services li .service__desc p {
+      font-size: 0.9rem;
+      padding: 0 1.25rem 0 0;
+      max-width: none;
+    }
+    .services li .service__desc .service__more {
+      font-size: 0.68rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .services li {
+      box-shadow: none;
+    }
+    .services li .service__desc {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+    .services li .service__desc p,
+    .services li .service__desc .service__more { transform: none; }
   }
 
   /* ---------- Project grid + CURSOR SPOTLIGHT ---------- */
@@ -1096,78 +1284,9 @@
     transform: scale(1);
   }
 
-  /* Mosaic grid overlay — cells mirror slices of the current image.
-     grid-template-columns / rows are set dynamically by JS to keep tiles
-     roughly square. The 8 / 6 fallback below only applies pre-init. */
+  /* Mosaic grid overlay — kept in DOM but unused (no dissolve) */
   .fullscreen-projects__grid {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(6, 1fr);
-    gap: 0;
-    opacity: 0;
-    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .fullscreen-projects__grid.is-dissolving {
-    opacity: 1;
-  }
-
-  .fullscreen-projects__grid-cell {
-    position: relative;
-    background-color: transparent;
-    background-repeat: no-repeat;
-    /* background-image + background-size + background-position set inline per transition */
-    opacity: 0;
-    transform: translate3d(0, 0, 0) scale(1);
-    transition:
-      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: opacity, transform;
-    pointer-events: none;
-  }
-
-  /* Translucent white wash over each tile — makes the mosaic read clearly */
-  .fullscreen-projects__grid-cell::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.72);
-    opacity: 0;
-    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-    pointer-events: none;
-    will-change: opacity;
-  }
-
-  .fullscreen-projects__grid.is-dissolving .fullscreen-projects__grid-cell {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    transition-delay: 0ms;
-  }
-
-  .fullscreen-projects__grid.is-dissolving .fullscreen-projects__grid-cell::after {
-    opacity: 1;
-    transition-delay: var(--cell-delay, 0ms);
-  }
-
-  .fullscreen-projects__grid.is-dissolving.is-revealing .fullscreen-projects__grid-cell {
-    opacity: 0;
-    transform:
-      translate3d(
-        calc(var(--cell-dx, 0) * 1px),
-        calc(var(--cell-dy, 0) * 1px),
-        0
-      )
-      scale(0.94);
-    transition-delay: var(--cell-delay-rev, 0ms);
-  }
-
-  .fullscreen-projects__grid.is-dissolving.is-revealing .fullscreen-projects__grid-cell::after {
-    opacity: 0;
-    transition-delay: var(--cell-delay-rev, 0ms);
+    display: none;
   }
 
   .fullscreen-projects__overlay {
@@ -1435,74 +1554,9 @@
     transform: scale(1);
   }
 
-  /* Mosaic grid overlay — cells mirror slices of the current image */
+  /* Mosaic grid overlay — kept in DOM but unused (no dissolve) */
   .fullscreen-interior__grid {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(6, 1fr);
-    gap: 0;
-    opacity: 0;
-    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .fullscreen-interior__grid.is-dissolving {
-    opacity: 1;
-  }
-
-  .fullscreen-interior__grid-cell {
-    position: relative;
-    background-color: transparent;
-    background-repeat: no-repeat;
-    opacity: 0;
-    transform: translate3d(0, 0, 0) scale(1);
-    transition:
-      opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: opacity, transform;
-    pointer-events: none;
-  }
-
-  .fullscreen-interior__grid-cell::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.72);
-    opacity: 0;
-    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-    pointer-events: none;
-    will-change: opacity;
-  }
-
-  .fullscreen-interior__grid.is-dissolving .fullscreen-interior__grid-cell {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    transition-delay: 0ms;
-  }
-
-  .fullscreen-interior__grid.is-dissolving .fullscreen-interior__grid-cell::after {
-    opacity: 1;
-    transition-delay: var(--cell-delay, 0ms);
-  }
-
-  .fullscreen-interior__grid.is-dissolving.is-revealing .fullscreen-interior__grid-cell {
-    opacity: 0;
-    transform:
-      translate3d(
-        calc(var(--cell-dx, 0) * 1px),
-        calc(var(--cell-dy, 0) * 1px),
-        0
-      )
-      scale(0.94);
-    transition-delay: var(--cell-delay-rev, 0ms);
-  }
-
-  .fullscreen-interior__grid.is-dissolving.is-revealing .fullscreen-interior__grid-cell::after {
-    opacity: 0;
-    transition-delay: var(--cell-delay-rev, 0ms);
+    display: none;
   }
 
   .fullscreen-interior__overlay {
@@ -1935,103 +1989,68 @@
     color: var(--accent);
   }
 
-  /* ---------- Interior Design + Architecture + Urban Design flows ---------- */
-  body.is-interior #siteHeader { display: none; }
-  body.is-interior main { padding-top: 0; }
-
-  .interior-chrome-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: var(--header-h);
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-    z-index: 69;
-    display: none;
-    pointer-events: none;
-  }
-  body.is-interior .interior-chrome-bar { display: block; }
-
-  .burger-fab {
-    position: fixed;
-    top: calc((var(--header-h) - 44px) / 2);
-    right: var(--gutter);
-    z-index: 70;
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-    width: 44px;
-    height: 44px;
-    padding: 0 12px;
-    background: transparent;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    cursor: pointer;
-    transition: background 0.3s var(--ease), border-color 0.3s var(--ease);
-  }
-  body.is-interior .burger-fab { display: flex; }
-
-  .burger-fab:hover { border-color: var(--ink); }
-
-  .burger-fab span {
-    display: block;
-    width: 100%;
-    height: 1.5px;
-    background: var(--ink);
-    transition: transform 0.35s var(--ease), opacity 0.25s var(--ease);
-  }
-  .burger-fab.is-open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
-  .burger-fab.is-open span:nth-child(2) { opacity: 0; }
-  .burger-fab.is-open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
-
-  .burger-fab:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-
-  .interior-logo {
-    position: fixed;
-    top: 0;
-    left: var(--gutter);
-    z-index: 70;
-    display: none;
-    font-family: Georgia, serif;
-    font-size: 1.25rem;
-    letter-spacing: 0.02em;
-    color: var(--ink);
-    text-decoration: none;
-    cursor: pointer;
-    line-height: var(--header-h);
-    height: var(--header-h);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: calc(100vw - 2 * var(--gutter) - 70px);
-  }
-  body.is-interior .interior-logo { display: block; }
+  /* ---------- Interior Design + Architecture + Urban Design flows ----------
+     These views share the SAME fixed site header as every other view, so no
+     separate chrome bar / floating burger / text logo is needed here. */
 
   /* =========================================================
      FULL-SCREEN OVERLAY MENU
+     — Solid paper menu with a circular "geometric" reveal that
+       originates from the hamburger button (origin set per-open
+       via JS using the --menu-x / --menu-y custom properties).
      ========================================================= */
   .burger-menu {
     position: fixed;
     inset: 0;
     z-index: 65;
+
+    /* Solid paper menu. The "glass" feel comes from the smooth circular
+       reveal — the menu itself stays paper, not frosted. */
     background: var(--paper);
+
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
     padding: calc(var(--header-h) + clamp(1rem, 3vw, 2rem)) var(--gutter) clamp(1.5rem, 4vw, 2.5rem);
-    opacity: 0;
-    visibility: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    transition: opacity 0.45s var(--ease-out), visibility 0.45s var(--ease-out);
+
+    /* Circular reveal defaults (overridden by JS on open) */
+    --menu-x: calc(100% - 40px);
+    --menu-y: 32px;
+
+    clip-path: circle(0px at var(--menu-x) var(--menu-y));
+    visibility: hidden;
+    /* No backdrop-filter here — a full-viewport blurred element,
+       even when clip-path hides it, keeps a GPU layer alive and
+       causes scroll twitch on the page behind it. */
+    transition:
+      clip-path 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .burger-menu.is-open { opacity: 1; visibility: visible; }
+  .burger-menu.is-open {
+    clip-path: circle(165vmax at var(--menu-x) var(--menu-y));
+    visibility: visible;
+  }
+
+  /* Overlay top bar — mirrors the site header (logo on the left) */
+  .burger-menu__topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    padding-inline: var(--gutter);
+    pointer-events: none;
+    z-index: 71;
+  }
+
+  .burger-menu__brand {
+    pointer-events: auto;
+  }
 
   .burger-menu__nav {
     width: 100%;
@@ -2165,8 +2184,6 @@
   .overlay-close span:nth-child(1) { transform: translateY(2.75px) rotate(45deg); }
   .overlay-close span:nth-child(2) { transform: translateY(-2.75px) rotate(-45deg); }
 
-  body.is-interior .overlay-close { display: none; }
-
   /* =========================================================
      INTERIOR DESIGN + ARCHITECTURE + URBAN DESIGN — CARD STACK
      ========================================================= */
@@ -2184,8 +2201,9 @@
     position: sticky;
     top: 0;
     z-index: 0;
-    height: 100vh;
-    height: 100dvh;
+    /* Sits in the space left by the fixed site header (main has padding-top). */
+    height: calc(100vh - var(--header-h));
+    height: calc(100dvh - var(--header-h));
     display: flex;
     align-items: flex-start;
     overflow: hidden;
@@ -2223,7 +2241,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding-top: calc(var(--header-h) + 2.5rem);
+    padding-top: clamp(2rem, 5vw, 3.5rem);
     padding-bottom: clamp(3rem, 7vw, 5.5rem);
     will-change: transform, opacity;
   }
@@ -2388,7 +2406,10 @@
   }
 
   @media (max-width: 760px) {
-    .idv__hero { height: 88vh; height: 88dvh; }
+    .idv__hero {
+      height: calc(88vh - var(--header-h));
+      height: calc(88dvh - var(--header-h));
+    }
     .idv__index { max-width: none; }
   }
 
@@ -2471,6 +2492,7 @@
 
     .nav { padding-block: 0.85rem; }
     .logo { font-size: 1.05rem; }
+    .logo--img img { height: 22px; }
 
     .nav ul a {
       padding: 0.95rem var(--gutter);
@@ -2481,13 +2503,19 @@
       min-height: 92vh;
       min-height: 92dvh;
     }
-    .hero__placeholder { background-attachment: scroll; }
-    .hero__inner { padding-block: 2.5rem 5rem; }
+    .hero__inner {
+      padding-top: calc(var(--header-h) + 2rem);
+      padding-bottom: 3rem;
+    }
     .hero .display { font-size: clamp(2.1rem, 10vw, 3.25rem); }
     .hero .eyebrow {
       font-size: 0.68rem;
       letter-spacing: 0.14em;
       margin-bottom: 1rem;
+    }
+    .hero__brand {
+      width: clamp(80px, 26vw, 130px);
+      margin-bottom: 1.1rem;
     }
     .hero p.lede {
       font-size: 0.98rem;
@@ -2585,9 +2613,12 @@
     .magazine__samples-grid { gap: 0.85rem; }
     .magazine__samples-grid .card { aspect-ratio: 4 / 3; }
 
-    .idv__hero { height: 92vh; height: 92dvh; }
+    .idv__hero {
+      height: calc(92vh - var(--header-h));
+      height: calc(92dvh - var(--header-h));
+    }
     .idv__hero-inner {
-      padding-top: calc(var(--header-h) + 1.5rem);
+      padding-top: 1.5rem;
       padding-bottom: 2.5rem;
     }
     .idv__hero .eyebrow { font-size: 0.68rem; margin-bottom: 0.6rem; }
@@ -2620,16 +2651,6 @@
     .idv__content--viewport {
       min-height: 92vh;
       min-height: 92dvh;
-    }
-
-    .burger-fab {
-      top: calc((var(--header-h) - 44px) / 2);
-      width: 44px;
-      height: 44px;
-    }
-    .interior-logo {
-      font-size: 1.05rem;
-      max-width: calc(100vw - 2 * var(--gutter) - 64px);
     }
 
     .burger-menu {
@@ -2704,6 +2725,7 @@
 
   @media (max-width: 400px) {
     .hero .display { font-size: 1.95rem; }
+    .hero__brand { width: clamp(72px, 30vw, 110px); }
     .idv__hero .display { font-size: 1.75rem; }
     .hero__logo { width: 48px; }
     .idv__index .idx-label { font-size: 1rem; }
@@ -2711,14 +2733,18 @@
   }
 
   @media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
-    .hero,
-    .idv__hero {
+    .hero {
       height: auto;
       min-height: 100vh;
       min-height: 100dvh;
     }
+    .idv__hero {
+      height: auto;
+      min-height: calc(100vh - var(--header-h));
+      min-height: calc(100dvh - var(--header-h));
+    }
     .idv__hero-inner {
-      padding-top: calc(var(--header-h) + 1rem);
+      padding-top: 1rem;
       padding-bottom: 1.5rem;
     }
     .idv__content--viewport {
@@ -2755,6 +2781,7 @@
     .hero__dots { display: none; }
     .kinetic-line > span { transform: none; animation: none; }
     .hero .eyebrow, .hero .lede { opacity: 1; transform: none; animation: none; }
+    .hero__brand { opacity: 1; transform: none; animation: none; }
     .reveal { opacity: 1; transform: none; }
     .intro h2 .word { opacity: 1; transform: none; }
     .card { transform: none !important; }
@@ -2790,7 +2817,9 @@
 
 <header id="siteHeader">
   <div class="wrap nav" id="primaryNavWrap">
-    <a href="#" class="logo" data-route="home">MG Design Engineering Company</a>
+    <a href="#" class="logo logo--img" data-route="home" aria-label="MGDECO Design Engineering Consultancy — Home">
+      <img src="https://cdn.jsdelivr.net/gh/mgdecoae/MGimages@main/mgdeco_4K_dark_50pct.png" alt="MGDECO Design Engineering Consultancy" />
+    </a>
     <nav aria-label="Primary">
       <ul id="primaryNav">
         <li><a href="#Services" data-route="Services">Services</a></li>
@@ -2809,20 +2838,16 @@
   </div>
 </header>
 
-<!-- Paper background bar for the Interior Design + Architecture + Urban Design flow chrome -->
-<div class="interior-chrome-bar" aria-hidden="true"></div>
-
-<button class="burger-fab" id="burgerFab" type="button"
-        aria-label="Open menu" aria-expanded="false" aria-controls="burgerMenu">
-  <span></span>
-  <span></span>
-  <span></span>
-</button>
-
-<a href="#" class="interior-logo" data-route="home">MG Design Engineering Company</a>
-
 <!-- ============ FULL-SCREEN OVERLAY MENU ============ -->
 <div class="burger-menu" id="burgerMenu" aria-hidden="true">
+
+  <!-- Overlay top bar — mirrors the site header (logo top-left, close top-right) -->
+  <div class="burger-menu__topbar">
+    <a href="#" class="logo logo--img burger-menu__brand" data-route="home" aria-label="MGDECO Design Engineering Consultancy — Home">
+      <img src="https://cdn.jsdelivr.net/gh/mgdecoae/MGimages@main/mgdeco_4K_dark_50pct.png" alt="MGDECO Design Engineering Consultancy" />
+    </a>
+  </div>
+
   <button class="overlay-close" id="overlayClose" type="button" aria-label="Close menu">
     <span></span>
     <span></span>
@@ -2855,11 +2880,13 @@
       <div class="hero__slides" id="heroSlides" style="view-transition-name: hero-media;" aria-hidden="true"></div>
       <div class="hero__dots" id="heroDots" role="tablist" aria-label="Hero image selector"></div>
 
-      <div class="hero__logo">
-        <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/MGdeco-logo-transparent-for-dark-bg.png" alt="MG Design Engineering logo" />
-      </div>
-
       <div class="wrap hero__inner">
+        <img class="hero__brand"
+             src="https://cdn.jsdelivr.net/gh/mgdecoae/MGimages@main/mgdeco_4K_white_FINAL.png"
+             alt="MGDECO Design Engineering Consultancy"
+             width="400" height="120"
+             decoding="async"
+             fetchpriority="high" />
         <p class="eyebrow">Architecture · Interior Design · Urban Solution Strategy</p>
         <h1 class="display">
           <span class="kinetic-line"><span>We shape places</span></span>
@@ -2886,11 +2913,56 @@
       <p class="eyebrow intro__eyebrow-services">Our services</p>
       <div class="intro__services">
         <ul class="services" aria-label="Our services">
-          <li><a href="#" data-route="interior-design"><span>Interior Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="architecture"><span>Architecture Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="urban-design"><span>Urban Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="work"><span>Urban Solution Strategy</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="work"><span>Project Management</span><span class="arrow" aria-hidden="true">→</span></a></li>
+          <li style="--i:0">
+            <a href="#" data-route="interior-design"><span>Interior Design</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Spatial planning, materiality, lighting and acoustics shaped around the people who will actually use the space — from first concept through to FF&amp;E, documentation and handover.</p>
+                <a href="#" class="service__more" data-route="interior-design">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
+          <li style="--i:1">
+            <a href="#" data-route="architecture"><span>Architecture Design</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Site, form, structure and environmental strategy resolved together — feasibility and concept design through to technical documentation, tender and site review.</p>
+                <a href="#" class="service__more" data-route="architecture">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
+          <li style="--i:2">
+            <a href="#" data-route="urban-design"><span>Urban Design</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Masterplans, public realm and movement frameworks that read clearly on a plan, work economically on a spreadsheet, and feel generous at eye level.</p>
+                <a href="#" class="service__more" data-route="urban-design">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
+          <li style="--i:3">
+            <a href="#" data-route="work"><span>Urban Solution Strategy</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Highest and Best Use analysis, market testing and commercial modelling that turn a site's raw potential into a clear, deliverable brief.</p>
+                <a href="#" class="service__more" data-route="work">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
+          <li style="--i:4">
+            <a href="#" data-route="work"><span>Project Management</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Programme, cost and consultant coordination from appointment to close-out — keeping design intent intact from first drawing to final handover.</p>
+                <a href="#" class="service__more" data-route="work">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
@@ -2971,11 +3043,56 @@
       <p class="eyebrow intro__eyebrow-services">Our services</p>
       <div class="intro__services">
         <ul class="services" aria-label="Our services">
-          <li><a href="#" data-route="interior-design"><span>Interior Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="architecture"><span>Architecture Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="urban-design"><span>Urban Design</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="work"><span>Urban Solution Strategy</span><span class="arrow" aria-hidden="true">→</span></a></li>
-          <li><a href="#" data-route="work"><span>Project Management</span><span class="arrow" aria-hidden="true">→</span></a></li>
+          <li style="--i:0">
+            <a href="#" data-route="interior-design"><span>Interior Design</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Spatial planning, materiality, lighting and acoustics shaped around the people who will actually use the space — from first concept through to FF&amp;E, documentation and handover.</p>
+                <a href="#" class="service__more" data-route="interior-design">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
+          <li style="--i:1">
+            <a href="#" data-route="architecture"><span>Architecture Design</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Site, form, structure and environmental strategy resolved together — feasibility and concept design through to technical documentation, tender and site review.</p>
+                <a href="#" class="service__more" data-route="architecture">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
+          <li style="--i:2">
+            <a href="#" data-route="urban-design"><span>Urban Design</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Masterplans, public realm and movement frameworks that read clearly on a plan, work economically on a spreadsheet, and feel generous at eye level.</p>
+                <a href="#" class="service__more" data-route="urban-design">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
+          <li style="--i:3">
+            <a href="#" data-route="work"><span>Urban Solution Strategy</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Highest and Best Use analysis, market testing and commercial modelling that turn a site's raw potential into a clear, deliverable brief.</p>
+                <a href="#" class="service__more" data-route="work">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
+          <li style="--i:4">
+            <a href="#" data-route="work"><span>Project Management</span><span class="arrow" aria-hidden="true">→</span></a>
+            <div class="service__desc">
+              <div>
+                <p>Programme, cost and consultant coordination from appointment to close-out — keeping design intent intact from first drawing to final handover.</p>
+                <a href="#" class="service__more" data-route="work">Explore more <span aria-hidden="true">→</span></a>
+                <br>
+              </div>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
@@ -3048,7 +3165,7 @@
               shaped around the people who will actually use the space.
             </p>
             <p class="magazine__dropcap">
-              Interior design at MG Design Engineering begins with a simple question: how will this space
+              Interior design at MGDECO Design Engineering Consultancy begins with a simple question: how will this space
               really be used? From that answer we build a brief that balances atmosphere with operation —
               so the finished interior supports daily life, reinforces the identity of the place, and holds
               its value long after handover.
@@ -3292,7 +3409,7 @@
               climate, and the way people will actually move through them.
             </p>
             <p class="magazine__dropcap">
-              Architecture at MG Design Engineering begins with the site and the brief in equal measure.
+              Architecture at MGDECO Design Engineering Consultancy begins with the site and the brief in equal measure.
               We read orientation, access, context and constraint before a line is drawn — so the building
               that emerges is shaped by where it stands and who it serves, not by a style applied after
               the fact.
@@ -3559,7 +3676,7 @@
               is the discipline of getting those relationships right before the buildings arrive.
             </p>
             <p class="magazine__dropcap">
-              Urban design at MG Design Engineering works at the scale where architecture meets
+              Urban design at MGDECO Design Engineering Consultancy works at the scale where architecture meets
               infrastructure. We begin with how people, goods and water move through a site, then shape
               blocks, streets, public spaces and density around that movement — so the masterplan is
               legible long before it is built, and stays usable long after.
@@ -3791,7 +3908,7 @@
       <button class="back-btn" data-route="home"><span class="arrow">←</span> Back</button>
     </div>
     <div class="wrap view-body">
-      <p>MG Design Engineering is an interdisciplinary practice of architects, interior designers, and urban strategists. We work where property, interior, and urban development converge.</p>
+      <p>MGDECO Design Engineering Consultancy is an interdisciplinary practice of architects, interior designers, and urban strategists. We work where property, interior, and urban development converge.</p>
       <p>Ideas are tested early and prototyped often. Every brief is shaped by evidence — market data, user insight, and commercial modelling — rather than assumption.</p>
     </div>
   </section>
@@ -3832,7 +3949,7 @@
   <div class="wrap">
     <div class="footer-grid">
       <div>
-        <a href="#" class="logo" data-route="home">MG Design Engineering Company</a>
+        <a href="#" class="logo" data-route="home">MGDECO Design Engineering Consultancy</a>
         <p style="margin-top: 1rem; max-width: 34ch;">
           Architecture, design and strategy for places that work
           as well as they look.
@@ -3856,7 +3973,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 MG Design Engineering Company. All rights reserved.</span>
+      <span>© 2026 MGDECO Design Engineering Consultancy. All rights reserved.</span>
       <span>Privacy · Cookies</span>
     </div>
   </div>
@@ -3892,6 +4009,85 @@
     { threshold: 0.15, rootMargin: '0px 0px -60px 0px' }
   );
   document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  /* =========================================================
+     2b. SCROLL ACCORDION — OUR SERVICES
+
+         Items scroll naturally with the page (no sticky pinning).
+         Each row is tested against its own live top position:
+
+           • Expands when its top crosses 1/5 up from the viewport
+             bottom — i.e. rect.top <= 80% of viewport height.
+           • Collapses when its top crosses 1/5 down from the
+             viewport top — i.e. rect.top <= 20% of viewport height.
+           • Reverses naturally when scrolling back up.
+
+         Because nothing is pinned, once a row collapses it simply
+         continues moving up and out of view as normal — nothing
+         halts its motion.
+     ========================================================= */
+  (function initServicesAccordion() {
+    const lists = Array.from(document.querySelectorAll('.services'));
+    if (!lists.length) return;
+
+    const EXPAND_RATIO   = 0.8; /* 1/5 up from bottom  → 80% from top */
+    const COLLAPSE_RATIO = 0.2; /* 1/5 down from top   → 20% from top */
+
+    lists.forEach((list) => {
+      const items = Array.from(list.children);
+      if (!items.length) return;
+
+      if (reduceMotion) {
+        items.forEach((li) => li.classList.add('is-open'));
+        return;
+      }
+
+      let ticking = false;
+
+      function updateActive() {
+        const vh = window.innerHeight || 1;
+        const expandLine   = vh * EXPAND_RATIO;
+        const collapseLine = vh * COLLAPSE_RATIO;
+
+        items.forEach((li) => {
+          /* Skip items that aren't rendered (inactive view). */
+          if (!li.offsetParent) {
+            li.classList.remove('is-open');
+            return;
+          }
+
+          const top = li.getBoundingClientRect().top;
+
+          /* Open while the row's top sits between the
+             expand line (bottom 1/5) and the collapse line
+             (top 1/5).  Below the expand line → still closed.
+             Above the collapse line → closed again. */
+          const shouldBeOpen = top <= expandLine && top > collapseLine;
+
+          li.classList.toggle('is-open', shouldBeOpen);
+        });
+      }
+
+      function onScroll() {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            updateActive();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', updateActive, { passive: true });
+      window.addEventListener('mg:viewchange', () => {
+        requestAnimationFrame(updateActive);
+      });
+
+      /* Initial state. */
+      updateActive();
+    });
+  })();
 
   /* =========================================================
      3. HERO SLIDER
@@ -4144,10 +4340,8 @@
     if (reduceMotion) return;
     const vh = window.innerHeight;
 
-    if (heroSlidesEl) {
-      const offset = Math.min(window.scrollY * 0.25, 200);
-      heroSlidesEl.style.transform = `translateY(${offset}px)`;
-    }
+    /* Hero-slides parallax removed — it conflicted with the hero
+       image's own scale animation and produced scroll jitter. */
 
     parallaxEls.forEach((img) => {
       const wrap = img.parentElement;
@@ -4293,12 +4487,6 @@
     currentView = route;
     setActiveNav(route);
 
-    /* Interior, Architecture and Urban Design use the burger chrome. */
-    const isInteriorFlow =
-      route === 'interior-design' ||
-      route === 'architecture' ||
-      route === 'urban-design';
-    document.body.classList.toggle('is-interior', isInteriorFlow);
     closeBurgerMenu();
     closeNavMenu();
 
@@ -4317,6 +4505,10 @@
 
     next.querySelectorAll('.reveal:not(.is-visible)').forEach((el) => io.observe(el));
 
+    /* Notify listeners (e.g. the services accordion) that the
+       active view changed so they can recompute their state. */
+    window.dispatchEvent(new CustomEvent('mg:viewchange'));
+
     requestAnimationFrame(() => {
       updateStickyStack();
       updateParallax();
@@ -4326,7 +4518,17 @@
   }
 
   function navigate(route) {
-    if (route === currentView) return;
+    /* If the user is already on this view, just close any open menus
+       (and scroll back to the top of the view). This makes the Home
+       button / logo respond even when already on Home. */
+    if (route === currentView) {
+      closeBurgerMenu();
+      closeNavMenu();
+      if (window.scrollY > 0) {
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      }
+      return;
+    }
 
     if (!supportsVT || reduceMotion) {
       showView(route);
@@ -4388,30 +4590,47 @@
 
   /* =========================================================
      8. FULL-SCREEN OVERLAY MENU
-        (site header on all main views + Interior/Architecture/Urban chrome)
+        — Solid paper panel (no backdrop-filter, so it doesn't
+          keep a GPU layer alive on scroll behind it)
+        — Circular "geometric" reveal from the hamburger button
+        — Topbar mirrors the site header (logo top-left)
      ========================================================= */
-  const burgerBtn = document.getElementById('burgerFab');
   const burgerMenu = document.getElementById('burgerMenu');
   const overlayClose = document.getElementById('overlayClose');
 
+  /* Set the origin of the circular reveal to the hamburger button. */
+  function setMenuOrigin() {
+    if (!burgerMenu) return;
+    let x = Math.max(0, window.innerWidth - 40);
+    let y = 32;
+    if (navToggle) {
+      const r = navToggle.getBoundingClientRect();
+      x = r.left + r.width / 2;
+      y = r.top + r.height / 2;
+    }
+    burgerMenu.style.setProperty('--menu-x', x + 'px');
+    burgerMenu.style.setProperty('--menu-y', y + 'px');
+  }
+
   function openBurgerMenu() {
     if (!burgerMenu) return;
+
+    /* Pin the circle's origin to the hamburger before showing. */
+    setMenuOrigin();
+
+    /* Paint the closed state once so the clip-path transition runs. */
+    void burgerMenu.offsetWidth;
 
     burgerMenu.classList.add('is-open');
     burgerMenu.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
 
-    if (burgerBtn) {
-      burgerBtn.classList.add('is-open');
-      burgerBtn.setAttribute('aria-expanded', 'true');
-      burgerBtn.setAttribute('aria-label', 'Close menu');
-    }
     if (navToggle) {
       navToggle.classList.add('is-open');
       navToggle.setAttribute('aria-expanded', 'true');
       navToggle.setAttribute('aria-label', 'Close menu');
     }
-    if (overlayClose && !document.body.classList.contains('is-interior')) {
+    if (overlayClose) {
       overlayClose.focus({ preventScroll: true });
     }
   }
@@ -4423,23 +4642,11 @@
     burgerMenu.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
 
-    if (burgerBtn) {
-      burgerBtn.classList.remove('is-open');
-      burgerBtn.setAttribute('aria-expanded', 'false');
-      burgerBtn.setAttribute('aria-label', 'Open menu');
-    }
     if (navToggle) {
       navToggle.classList.remove('is-open');
       navToggle.setAttribute('aria-expanded', 'false');
       navToggle.setAttribute('aria-label', 'Open menu');
     }
-  }
-
-  if (burgerBtn) {
-    burgerBtn.addEventListener('click', () => {
-      if (burgerMenu && burgerMenu.classList.contains('is-open')) closeBurgerMenu();
-      else openBurgerMenu();
-    });
   }
 
   if (overlayClose) {
@@ -4685,12 +4892,11 @@
 
   /* =========================================================
      10. FULLSCREEN PROJECT BACKGROUND SLIDESHOW
-          (dynamic mosaic mirror dissolve — current image tiles away)
+          (simple cross-fade — no mosaic dissolve)
      ========================================================= */
   (function initFullscreenProjects() {
     const container = document.getElementById('fullscreenProjects');
     const bgStack = document.getElementById('fsBgStack');
-    const gridEl = document.getElementById('fsGrid');
     const dotsContainer = document.getElementById('fsDots');
     const titleEl = document.getElementById('fsTitle');
     const categoryEl = document.getElementById('fsCategory');
@@ -4717,31 +4923,8 @@
     let dotElements = [];
     let autoTimer = null;
     let progressInterval = null;
-    let isTransitioning = false;
     const AUTO_INTERVAL = 6000;
     const PROGRESS_STEP = 50;
-
-    /* --- Dynamic grid geometry ---------------------------------
-       Tiles are kept roughly square by deriving COLS/ROWS from the
-       container's aspect ratio and a target tile size. Recomputed on
-       resize. The mosaic mirror, wave delays and shatter offsets all
-       read from these live values. */
-    let COLS = 8;
-    let ROWS = 6;
-    const TARGET_TILE = 140; // px — approximate tile size (both axes)
-
-    function computeGridDims() {
-      const w = container.clientWidth || window.innerWidth || 1;
-      const h = container.clientHeight || window.innerHeight || 1;
-
-      // Aim for ~TARGET_TILE px tiles, clamped to sensible bounds.
-      COLS = Math.max(6, Math.min(16, Math.round(w / TARGET_TILE)));
-      ROWS = Math.max(4, Math.min(12, Math.round(h / TARGET_TILE)));
-
-      // Safety: at least 1 of each
-      if (COLS < 1) COLS = 1;
-      if (ROWS < 1) ROWS = 1;
-    }
 
     /* --- Build slides --- */
     projects.forEach((p, i) => {
@@ -4759,68 +4942,6 @@
       bgStack.appendChild(slide);
       slideElements.push(slide);
     });
-
-    /* --- Grid build / rebuild (fully dynamic on resize) ---
-       Rebuilds the grid overlay to match the current COLS × ROWS, updates
-       the CSS grid-template, and recomputes every cell's diagonal wave
-       delay + shatter drift. Called once on init and again on resize. */
-    function buildGrid() {
-      if (!gridEl) return;
-
-      computeGridDims();
-
-      // Update the CSS grid to match the live column / row counts
-      gridEl.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
-      gridEl.style.gridTemplateRows = `repeat(${ROWS}, 1fr)`;
-
-      // Wipe and rebuild cells
-      gridEl.innerHTML = '';
-
-      const STEP_MS = 18;       // base delay per diagonal step
-      const WAVE_AMP_MS = 90;   // extra delay from the sine wave
-      const WAVE_FREQ = 1.4;    // how many waves across the grid
-      const MAX_DIAG = Math.max(1, (COLS - 1) + (ROWS - 1));
-
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const cell = document.createElement('div');
-          cell.className = 'fullscreen-projects__grid-cell';
-
-          // Diagonal position from top-left for the white wash in
-          const diag = c + r;
-          const waveIn = Math.sin((diag / MAX_DIAG) * Math.PI * WAVE_FREQ);
-          const delayIn = Math.round(diag * STEP_MS + (waveIn + 1) * WAVE_AMP_MS);
-
-          // Diagonal position from bottom-right for the reveal-out
-          const diagRev = (COLS - 1 - c) + (ROWS - 1 - r);
-          const waveRev = Math.sin((diagRev / MAX_DIAG) * Math.PI * WAVE_FREQ);
-          const delayOut = Math.round(diagRev * STEP_MS + (waveRev + 1) * WAVE_AMP_MS);
-
-          // Shatter drift: push each tile outward from grid centre as it fades
-          const dx = Math.round((c - (COLS - 1) / 2) * 1.6);
-          const dy = Math.round((r - (ROWS - 1) / 2) * 1.6);
-
-          cell.style.setProperty('--cell-delay', delayIn + 'ms');
-          cell.style.setProperty('--cell-delay-rev', delayOut + 'ms');
-          cell.style.setProperty('--cell-dx', dx);
-          cell.style.setProperty('--cell-dy', dy);
-          gridEl.appendChild(cell);
-        }
-      }
-    }
-
-    // Initial build
-    buildGrid();
-
-    // Rebuild on resize (debounced) so tiles stay roughly square
-    let gridResizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(gridResizeTimer);
-      gridResizeTimer = setTimeout(() => {
-        // Skip rebuild while a dissolve is mid-flight to avoid glitches
-        if (!isTransitioning) buildGrid();
-      }, 180);
-    }, { passive: true });
 
     /* --- Build dots --- */
     if (dotsContainer) {
@@ -4845,70 +4966,16 @@
       if (yearEl) yearEl.textContent = p.year;
     }
 
-    /* --- Mosaic mirror: paint each cell with its slice of the outgoing image ---
-       Reads the *live* COLS/ROWS so it stays correct after a resize. */
-    function mirrorGridToSlide(src) {
-      if (!gridEl) return;
-      const cells = gridEl.querySelectorAll('.fullscreen-projects__grid-cell');
-      if (!cells.length) return;
-
-      cells.forEach((cell, i) => {
-        const c = i % COLS;
-        const r = Math.floor(i / COLS);
-
-        // Position this cell's slice within the whole image
-        const posX = COLS > 1 ? (c / (COLS - 1)) * 100 : 50;
-        const posY = ROWS > 1 ? (r / (ROWS - 1)) * 100 : 50;
-
-        cell.style.backgroundImage = `url("${src}")`;
-        // Scale so the full image spans all columns/rows
-        cell.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
-        cell.style.backgroundPosition = `${posX}% ${posY}%`;
-      });
-    }
-
-    /* --- Mosaic dissolve: mirror current → white-wash in → swap → shatter out --- */
-    function triggerDissolve(callback) {
-      if (!gridEl || reduceMotion) {
-        if (callback) callback();
-        return;
-      }
-
-      // 1. Mirror the outgoing image across the grid (looks identical to the slide)
-      mirrorGridToSlide(projects[currentIndex].src);
-
-      // 2. Snap grid + cells to full opacity. Now the mosaic is indistinguishable
-      //    from the underlying slide — then the white wash starts building in a
-      //    staggered diagonal wave across the tiles.
-      gridEl.classList.remove('is-revealing');
-      gridEl.classList.add('is-dissolving');
-
-      // 3. Let the white wash visibly build across the tiles, THEN swap the
-      //    underlying slide and shatter the tiles away.
-      setTimeout(() => {
-        if (callback) callback();
-
-        gridEl.classList.add('is-revealing');
-
-        // 4. Clean up after the longest possible reveal delay
-        setTimeout(() => {
-          gridEl.classList.remove('is-dissolving', 'is-revealing');
-        }, 1300);
-      }, 900);
-    }
-
-    /* --- Navigate to a slide --- */
+    /* --- Navigate to a slide (simple cross-fade, no mosaic) --- */
     function goTo(index, userInitiated = false) {
-      if (isTransitioning) return;
-      if (index === currentIndex && slideElements.length > 1 && !userInitiated) return;
-
       let nextIndex = index;
       if (nextIndex < 0) nextIndex = slideElements.length - 1;
       if (nextIndex >= slideElements.length) nextIndex = 0;
 
-      if (nextIndex === currentIndex && userInitiated) return;
-
-      isTransitioning = true;
+      if (nextIndex === currentIndex) {
+        if (userInitiated) restartAutoTimer();
+        return;
+      }
 
       // Update dots immediately for responsiveness
       dotElements.forEach((d, i) => {
@@ -4916,22 +4983,13 @@
         d.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
       });
 
-      const doChange = () => {
-        // Swap active slide
-        slideElements.forEach((s, i) => {
-          s.classList.toggle('is-active', i === nextIndex);
-        });
-        currentIndex = nextIndex;
-        updateMeta();
-        resetProgress();
-        isTransitioning = false;
-      };
-
-      if (reduceMotion) {
-        doChange();
-      } else {
-        triggerDissolve(doChange);
-      }
+      // Swap active slide (cross-fade handled by CSS opacity transition)
+      slideElements.forEach((s, i) => {
+        s.classList.toggle('is-active', i === nextIndex);
+      });
+      currentIndex = nextIndex;
+      updateMeta();
+      resetProgress();
 
       if (userInitiated) restartAutoTimer();
     }
@@ -5034,12 +5092,11 @@
 
   /* =========================================================
      11. FULLSCREEN INTERIOR BACKGROUND SLIDESHOW
-          (dynamic mosaic mirror dissolve — current image tiles away)
+          (simple cross-fade — no mosaic dissolve)
      ========================================================= */
   (function initFullscreenInterior() {
     const container = document.getElementById('fullscreenInterior');
     const bgStack = document.getElementById('fiBgStack');
-    const gridEl = document.getElementById('fiGrid');
     const dotsContainer = document.getElementById('fiDots');
     const titleEl = document.getElementById('fiTitle');
     const categoryEl = document.getElementById('fiCategory');
@@ -5100,25 +5157,8 @@
     let dotElements = [];
     let autoTimer = null;
     let progressInterval = null;
-    let isTransitioning = false;
     const AUTO_INTERVAL = 6000;
     const PROGRESS_STEP = 50;
-
-    /* --- Dynamic grid geometry --- */
-    let COLS = 8;
-    let ROWS = 6;
-    const TARGET_TILE = 140;
-
-    function computeGridDims() {
-      const w = container.clientWidth || window.innerWidth || 1;
-      const h = container.clientHeight || window.innerHeight || 1;
-
-      COLS = Math.max(6, Math.min(16, Math.round(w / TARGET_TILE)));
-      ROWS = Math.max(4, Math.min(12, Math.round(h / TARGET_TILE)));
-
-      if (COLS < 1) COLS = 1;
-      if (ROWS < 1) ROWS = 1;
-    }
 
     /* --- Build slides --- */
     projects.forEach((p, i) => {
@@ -5136,57 +5176,6 @@
       bgStack.appendChild(slide);
       slideElements.push(slide);
     });
-
-    /* --- Grid build / rebuild (fully dynamic on resize) --- */
-    function buildGrid() {
-      if (!gridEl) return;
-
-      computeGridDims();
-
-      gridEl.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
-      gridEl.style.gridTemplateRows = `repeat(${ROWS}, 1fr)`;
-
-      gridEl.innerHTML = '';
-
-      const STEP_MS = 18;
-      const WAVE_AMP_MS = 90;
-      const WAVE_FREQ = 1.4;
-      const MAX_DIAG = Math.max(1, (COLS - 1) + (ROWS - 1));
-
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const cell = document.createElement('div');
-          cell.className = 'fullscreen-interior__grid-cell';
-
-          const diag = c + r;
-          const waveIn = Math.sin((diag / MAX_DIAG) * Math.PI * WAVE_FREQ);
-          const delayIn = Math.round(diag * STEP_MS + (waveIn + 1) * WAVE_AMP_MS);
-
-          const diagRev = (COLS - 1 - c) + (ROWS - 1 - r);
-          const waveRev = Math.sin((diagRev / MAX_DIAG) * Math.PI * WAVE_FREQ);
-          const delayOut = Math.round(diagRev * STEP_MS + (waveRev + 1) * WAVE_AMP_MS);
-
-          const dx = Math.round((c - (COLS - 1) / 2) * 1.6);
-          const dy = Math.round((r - (ROWS - 1) / 2) * 1.6);
-
-          cell.style.setProperty('--cell-delay', delayIn + 'ms');
-          cell.style.setProperty('--cell-delay-rev', delayOut + 'ms');
-          cell.style.setProperty('--cell-dx', dx);
-          cell.style.setProperty('--cell-dy', dy);
-          gridEl.appendChild(cell);
-        }
-      }
-    }
-
-    buildGrid();
-
-    let gridResizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(gridResizeTimer);
-      gridResizeTimer = setTimeout(() => {
-        if (!isTransitioning) buildGrid();
-      }, 180);
-    }, { passive: true });
 
     /* --- Build dots --- */
     if (dotsContainer) {
@@ -5211,79 +5200,30 @@
       if (yearEl) yearEl.textContent = p.year;
     }
 
-    /* --- Mosaic mirror: paint each cell with its slice of the outgoing image --- */
-    function mirrorGridToSlide(src) {
-      if (!gridEl) return;
-      const cells = gridEl.querySelectorAll('.fullscreen-interior__grid-cell');
-      if (!cells.length) return;
-
-      cells.forEach((cell, i) => {
-        const c = i % COLS;
-        const r = Math.floor(i / COLS);
-
-        const posX = COLS > 1 ? (c / (COLS - 1)) * 100 : 50;
-        const posY = ROWS > 1 ? (r / (ROWS - 1)) * 100 : 50;
-
-        cell.style.backgroundImage = `url("${src}")`;
-        cell.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
-        cell.style.backgroundPosition = `${posX}% ${posY}%`;
-      });
-    }
-
-    /* --- Mosaic dissolve: mirror current → white-wash in → swap → shatter out --- */
-    function triggerDissolve(callback) {
-      if (!gridEl || reduceMotion) {
-        if (callback) callback();
-        return;
-      }
-
-      mirrorGridToSlide(projects[currentIndex].src);
-
-      gridEl.classList.remove('is-revealing');
-      gridEl.classList.add('is-dissolving');
-
-      setTimeout(() => {
-        if (callback) callback();
-        gridEl.classList.add('is-revealing');
-        setTimeout(() => {
-          gridEl.classList.remove('is-dissolving', 'is-revealing');
-        }, 1300);
-      }, 900);
-    }
-
-    /* --- Navigate to a slide --- */
+    /* --- Navigate to a slide (simple cross-fade, no mosaic) --- */
     function goTo(index, userInitiated = false) {
-      if (isTransitioning) return;
-      if (index === currentIndex && slideElements.length > 1 && !userInitiated) return;
-
       let nextIndex = index;
       if (nextIndex < 0) nextIndex = slideElements.length - 1;
       if (nextIndex >= slideElements.length) nextIndex = 0;
 
-      if (nextIndex === currentIndex && userInitiated) return;
+      if (nextIndex === currentIndex) {
+        if (userInitiated) restartAutoTimer();
+        return;
+      }
 
-      isTransitioning = true;
-
+      // Update dots immediately for responsiveness
       dotElements.forEach((d, i) => {
         d.classList.toggle('is-active', i === nextIndex);
         d.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
       });
 
-      const doChange = () => {
-        slideElements.forEach((s, i) => {
-          s.classList.toggle('is-active', i === nextIndex);
-        });
-        currentIndex = nextIndex;
-        updateMeta();
-        resetProgress();
-        isTransitioning = false;
-      };
-
-      if (reduceMotion) {
-        doChange();
-      } else {
-        triggerDissolve(doChange);
-      }
+      // Swap active slide (cross-fade handled by CSS opacity transition)
+      slideElements.forEach((s, i) => {
+        s.classList.toggle('is-active', i === nextIndex);
+      });
+      currentIndex = nextIndex;
+      updateMeta();
+      resetProgress();
 
       if (userInitiated) restartAutoTimer();
     }
