@@ -8,6 +8,10 @@
 <!-- Speed up CDN image delivery -->
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+<!-- GSAP — required by the hero-beats rotator. Loaded before the inline script. -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
 <style>
   /* ---------- Design tokens ---------- */
   :root {
@@ -127,7 +131,6 @@
     width: auto;
     max-width: 100%;
     object-fit: contain;
-    /* The source asset is dark on transparent — no filter needed on paper. */
     filter: none;
     transition: opacity 0.3s var(--ease);
   }
@@ -240,7 +243,7 @@
     position: relative;
     min-height: 88vh;
     display: flex;
-    align-items: center;         /* was flex-end → now vertically centered */
+    align-items: center;
     color: #fff;
     overflow: hidden;
     margin-top: calc(-1 * var(--header-h));
@@ -261,8 +264,6 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    /* `background-attachment: fixed` removed — it forces a repaint
-       on every scroll frame and produced visible jitter. */
     filter: brightness(0.55);
     pointer-events: none;
   }
@@ -321,18 +322,19 @@
     object-fit: contain;
   }
 
-  /* Brand logo sitting above the hero eyebrow */
+  /* Brand logo sitting above the hero beats.
+     Now uses the light horizontal asset (white type, no pipes),
+     sized up for the wider lockup. */
   .hero__brand {
     display: block;
-    width: clamp(90px, 12vw, 170px);
+    width: clamp(140px, 20vw, 260px);
     height: auto;
     object-fit: contain;
-    margin-bottom: clamp(1rem, 2.2vw, 1.75rem);
+    margin-bottom: clamp(1.25rem, 2.6vw, 2rem);
     opacity: 0;
     transform: translateY(16px);
     animation: fadeUp 1s var(--ease-out) forwards;
     animation-delay: 0s;
-    /* White-on-transparent asset — no filter needed over the darkened hero. */
     filter: none;
   }
 
@@ -373,8 +375,6 @@
 
   .hero__inner {
     position: relative;
-    /* Balanced padding — content sits visually centred in the
-       visible viewport (which starts just below the glass header). */
     padding-block: calc(var(--header-h) + clamp(2rem, 5vw, 4rem)) clamp(3rem, 7vw, 5rem);
     max-width: 900px;
     z-index: 2;
@@ -389,30 +389,17 @@
 
   .hero .eyebrow { color: rgba(255,255,255,0.75); margin-bottom: 1.25rem; }
 
-  .hero p.lede {
-    margin-top: 1.75rem;
-    max-width: 42ch;
-    font-size: 1.05rem;
-    color: rgba(255,255,255,0.9);
-  }
-
-  .kinetic-line { display: block; overflow: hidden; }
-  .kinetic-line > span {
-    display: block;
-    transform: translateY(110%);
-    animation: lineRise 1.1s var(--ease-out) forwards;
-  }
-  .kinetic-line:nth-child(1) > span { animation-delay: 0.15s; }
-  .kinetic-line:nth-child(2) > span { animation-delay: 0.3s; }
-  @keyframes lineRise { to { transform: translateY(0); } }
-
-  .hero .eyebrow, .hero .lede {
+  /* Legacy static hero rules — now scoped to direct children of
+     .hero__inner so they don't interfere with the beat-level
+     .eyebrow / .lede that GSAP animates. */
+  .hero__inner > .eyebrow,
+  .hero__inner > .lede {
     opacity: 0;
     transform: translateY(16px);
     animation: fadeUp 1s var(--ease-out) forwards;
   }
-  .hero .eyebrow { animation-delay: 0.05s; }
-  .hero .lede   { animation-delay: 0.75s; }
+  .hero__inner > .eyebrow { animation-delay: 0.05s; }
+  .hero__inner > .lede   { animation-delay: 0.75s; }
   @keyframes fadeUp { to { opacity: 1; transform: none; } }
 
   /* ---------- Editorial intro / Studio ---------- */
@@ -544,19 +531,6 @@
 
   /* =========================================================
      SCROLL ACCORDION — OUR SERVICES
-
-     Items scroll naturally with the page (no sticky pinning).
-     Each row is tested against its own live top position:
-
-       • Expands when its top crosses 1/5 up from the viewport
-         bottom — i.e. rect.top <= 80% of viewport height.
-       • Collapses when its top crosses 1/5 down from the
-         viewport top — i.e. rect.top <= 20% of viewport height.
-       • Reverses naturally when scrolling back up.
-
-     Because nothing is pinned, once a row collapses it simply
-     continues moving up and out of view as normal — nothing
-     halts its motion.
      ========================================================= */
   .services {
     position: relative;
@@ -576,7 +550,6 @@
     box-shadow: 0 16px 26px -22px rgba(20, 17, 15, 0.55);
   }
 
-  /* Last item keeps a clean edge — no shadow beneath it. */
   .services li:last-child,
   .services li:last-child.is-open {
     box-shadow: none;
@@ -636,7 +609,6 @@
     outline: none;
   }
 
-  /* The single visual break that follows each "Explore more" link. */
   .services li .service__desc > div > br {
     display: block;
     content: "";
@@ -1084,7 +1056,6 @@
     gap: 0.5rem;
   }
 
-  /* Step image placeholder */
   .magazine__steps .step-media {
     position: relative;
     width: 100%;
@@ -1284,7 +1255,6 @@
     transform: scale(1);
   }
 
-  /* Mosaic grid overlay — kept in DOM but unused (no dissolve) */
   .fullscreen-projects__grid {
     display: none;
   }
@@ -1460,7 +1430,6 @@
     border-color: var(--accent);
   }
 
-  /* Progress bar for auto-advance */
   .fullscreen-projects__progress {
     position: absolute;
     bottom: 0;
@@ -1554,7 +1523,6 @@
     transform: scale(1);
   }
 
-  /* Mosaic grid overlay — kept in DOM but unused (no dissolve) */
   .fullscreen-interior__grid {
     display: none;
   }
@@ -1730,7 +1698,6 @@
     border-color: var(--accent);
   }
 
-  /* Progress bar for auto-advance */
   .fullscreen-interior__progress {
     position: absolute;
     bottom: 0;
@@ -1966,7 +1933,6 @@
       margin-left: calc(-1 * clamp(120px, 34vw, 180px));
     }
   }
-  /* --- end coverflow --- */
 
   /* ---------- Back button (no border) ---------- */
   .back-btn {
@@ -1989,23 +1955,14 @@
     color: var(--accent);
   }
 
-  /* ---------- Interior Design + Architecture + Urban Design flows ----------
-     These views share the SAME fixed site header as every other view, so no
-     separate chrome bar / floating burger / text logo is needed here. */
-
   /* =========================================================
      FULL-SCREEN OVERLAY MENU
-     — Solid paper menu with a circular "geometric" reveal that
-       originates from the hamburger button (origin set per-open
-       via JS using the --menu-x / --menu-y custom properties).
      ========================================================= */
   .burger-menu {
     position: fixed;
     inset: 0;
     z-index: 65;
 
-    /* Solid paper menu. The "glass" feel comes from the smooth circular
-       reveal — the menu itself stays paper, not frosted. */
     background: var(--paper);
 
     display: flex;
@@ -2016,15 +1973,11 @@
     overflow-y: auto;
     overscroll-behavior: contain;
 
-    /* Circular reveal defaults (overridden by JS on open) */
     --menu-x: calc(100% - 40px);
     --menu-y: 32px;
 
     clip-path: circle(0px at var(--menu-x) var(--menu-y));
     visibility: hidden;
-    /* No backdrop-filter here — a full-viewport blurred element,
-       even when clip-path hides it, keeps a GPU layer alive and
-       causes scroll twitch on the page behind it. */
     transition:
       clip-path 0.75s cubic-bezier(0.16, 1, 0.3, 1),
       visibility 0.75s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2034,7 +1987,6 @@
     visibility: visible;
   }
 
-  /* Overlay top bar — mirrors the site header (logo on the left) */
   .burger-menu__topbar {
     position: absolute;
     top: 0;
@@ -2201,7 +2153,6 @@
     position: sticky;
     top: 0;
     z-index: 0;
-    /* Sits in the space left by the fixed site header (main has padding-top). */
     height: calc(100vh - var(--header-h));
     height: calc(100dvh - var(--header-h));
     display: flex;
@@ -2507,20 +2458,14 @@
       padding-top: calc(var(--header-h) + 2rem);
       padding-bottom: 3rem;
     }
-    .hero .display { font-size: clamp(2.1rem, 10vw, 3.25rem); }
     .hero .eyebrow {
       font-size: 0.68rem;
       letter-spacing: 0.14em;
       margin-bottom: 1rem;
     }
     .hero__brand {
-      width: clamp(80px, 26vw, 130px);
+      width: clamp(120px, 42vw, 200px);
       margin-bottom: 1.1rem;
-    }
-    .hero p.lede {
-      font-size: 0.98rem;
-      margin-top: 1.25rem;
-      max-width: 100%;
     }
     .hero__logo { width: 54px; }
     .hero__dots { gap: 0.85rem; bottom: 1rem; }
@@ -2724,8 +2669,7 @@
   }
 
   @media (max-width: 400px) {
-    .hero .display { font-size: 1.95rem; }
-    .hero__brand { width: clamp(72px, 30vw, 110px); }
+    .hero__brand { width: clamp(100px, 34vw, 150px); }
     .idv__hero .display { font-size: 1.75rem; }
     .hero__logo { width: 48px; }
     .idv__index .idx-label { font-size: 1rem; }
@@ -2779,8 +2723,6 @@
       filter: brightness(0.55);
     }
     .hero__dots { display: none; }
-    .kinetic-line > span { transform: none; animation: none; }
-    .hero .eyebrow, .hero .lede { opacity: 1; transform: none; animation: none; }
     .hero__brand { opacity: 1; transform: none; animation: none; }
     .reveal { opacity: 1; transform: none; }
     .intro h2 .word { opacity: 1; transform: none; }
@@ -2855,6 +2797,150 @@
       transition-duration: 0.001ms;
     }
   }
+
+  /* =========================================================
+     HERO BEATS — four-beat + CTA kinetic typography rotator
+     (Scoped additions — do not affect any other section.)
+     ========================================================= */
+
+  .hero-beats {
+    position: relative;
+    min-height: clamp(340px, 52vh, 620px);
+  }
+
+  .hero-beats .beat {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero-beats .beat.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .hero-beats .eyebrow {
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 1.25rem;
+  }
+
+  /* Beat headlines are longer than a typical hero headline, so the
+     display size is dialled back a notch to keep the same visual
+     weight without over-wrapping. */
+  .hero-beats .display {
+    font-size: clamp(1.85rem, 4.1vw, 3.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .hero-beats .headline .line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.12em;
+  }
+
+  .hero-beats .headline .word {
+    display: inline-block;
+    transform: translateY(110%);
+    opacity: 0;
+    filter: blur(6px);
+    will-change: transform, opacity, filter;
+  }
+
+  .hero-beats .headline .italic {
+    font-style: italic;
+    font-family: Georgia, serif;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .hero-beats .lede {
+    margin-top: 1.75rem;
+    max-width: 46ch;
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.88);
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(4px);
+    will-change: transform, opacity, filter;
+  }
+
+  .hero-beats .lede .em {
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* CTA link — beat 4 only */
+  .hero-beats .beat-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.75rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+    padding-bottom: 0.35rem;
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(4px);
+    will-change: transform, opacity, filter;
+    transition: gap 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease);
+  }
+
+  .hero-beats .beat-cta:hover,
+  .hero-beats .beat-cta:focus-visible {
+    gap: 1rem;
+    color: var(--accent);
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .hero-beats .beat-cta .arrow {
+    display: inline-block;
+    transition: transform 0.4s var(--ease-out);
+  }
+  .hero-beats .beat-cta:hover .arrow { transform: translateX(4px); }
+
+  @media (max-width: 760px) {
+    .hero-beats { min-height: clamp(360px, 58vh, 640px); }
+    .hero-beats .display { font-size: clamp(1.6rem, 7.4vw, 2.3rem); line-height: 1.14; }
+    .hero-beats .eyebrow { font-size: 0.68rem; letter-spacing: 0.14em; margin-bottom: 1rem; }
+    .hero-beats .lede { font-size: 0.95rem; max-width: 100%; margin-top: 1.25rem; }
+    .hero-beats .beat-cta { font-size: 0.72rem; margin-top: 1.25rem; }
+  }
+
+  /* Reduced motion — stack all beats statically and disable motion */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-beats { min-height: 0; }
+
+    .hero-beats .beat {
+      position: relative;
+      inset: auto;
+      opacity: 1;
+      pointer-events: auto;
+      padding-bottom: 2.5rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .hero-beats .beat:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .hero-beats .beat .eyebrow,
+    .hero-beats .beat .word,
+    .hero-beats .beat .lede,
+    .hero-beats .beat .beat-cta {
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -2898,7 +2984,6 @@
 <!-- ============ FULL-SCREEN OVERLAY MENU ============ -->
 <div class="burger-menu" id="burgerMenu" aria-hidden="true">
 
-  <!-- Overlay top bar — mirrors the site header (logo top-left, close top-right) -->
   <div class="burger-menu__topbar">
     <a href="#" class="logo logo--img burger-menu__brand" data-route="home" aria-label="MGDECO Design Engineering Consultancy — Home">
       <img src="https://cdn.jsdelivr.net/gh/mgdecoae/MGimages@main/mgdeco_4K_dark_50pct.png" alt="MGDECO Design Engineering Consultancy" />
@@ -2939,21 +3024,147 @@
 
       <div class="wrap hero__inner">
         <img class="hero__brand"
-             src="https://cdn.jsdelivr.net/gh/mgdecoae/MGimages@main/mgdeco_4K_white_FINAL.png"
+             src="https://cdn.jsdelivr.net/gh/mgdecoae/MGimages@main/mgdeco_light_horizontal_no_pipes.png"
              alt="MGDECO Design Engineering Consultancy"
              width="400" height="120"
              decoding="async"
              fetchpriority="high" />
-        <p class="eyebrow">Architecture · Interior Design · Urban Solution Strategy</p>
-        <h1 class="display">
-          <span class="kinetic-line"><span>We shape places</span></span>
-          <span class="kinetic-line"><span>that drive real value.</span></span>
-        </h1>
-        <p class="lede">
-          Commercial intelligence and creative ambition inform one another
-          from the first conversation — so every scheme is beautiful,
-          buildable, and commercially sound.
-        </p>
+
+        <!-- ============ HERO BEATS — FOUR-BEAT ROTATOR + CTA ============ -->
+        <div class="hero-beats" id="heroBeats">
+
+          <!-- ---------- BEAT 0 — Design Studio ---------- -->
+          <div class="beat active" data-beat="0">
+            <p class="eyebrow">Design Studio</p>
+            <h1 class="display headline">
+              <span class="line">
+                <span class="word">Every</span>
+                <span class="word">place</span>
+                <span class="word">we</span>
+                <span class="word">design</span>
+                <span class="word">is</span>
+                <span class="word">made</span>
+                <span class="word">to</span>
+                <span class="word">be</span>
+                <span class="word">experienced</span>
+              </span>
+              <span class="line">
+                <span class="word">—</span>
+                <span class="word">and</span>
+                <span class="word">to</span>
+                <span class="word">make</span>
+                <span class="word">leaving</span>
+                <span class="word italic">difficult.</span>
+              </span>
+            </h1>
+            <p class="lede">
+              We design places to be felt, not just seen — beautiful to the eye, rigorous to build,
+              and quietly precise in every detail. Trusted by the clients who commission them, the
+              developers who deliver them, and the consultants who build alongside us.
+            </p>
+          </div>
+
+          <!-- ---------- BEAT 1 — Private Commissions ---------- -->
+          <div class="beat" data-beat="1">
+            <p class="eyebrow">Private Commissions</p>
+            <h1 class="display headline">
+              <span class="line">
+                <span class="word">Designed</span>
+                <span class="word">to</span>
+                <span class="word">be</span>
+                <span class="word">felt,</span>
+              </span>
+              <span class="line">
+                <span class="word">not</span>
+                <span class="word">just</span>
+                <span class="word italic">seen.</span>
+              </span>
+            </h1>
+            <p class="lede">
+              Every surface, every transition, every quality of light — chosen for
+              <span class="em">how it lives</span>, and how it lasts.
+            </p>
+          </div>
+
+          <!-- ---------- BEAT 2 — For Developers ---------- -->
+          <div class="beat" data-beat="2">
+            <p class="eyebrow">For Developers</p>
+            <h1 class="display headline">
+              <span class="line">
+                <span class="word">A</span>
+                <span class="word">masterplan</span>
+                <span class="word">that</span>
+                <span class="word">works</span>
+                <span class="word">on</span>
+                <span class="word">the</span>
+                <span class="word">page,</span>
+              </span>
+              <span class="line">
+                <span class="word">and</span>
+                <span class="word">even</span>
+                <span class="word">better</span>
+                <span class="word">on</span>
+                <span class="word">the</span>
+                <span class="word italic">ground.</span>
+              </span>
+            </h1>
+            <p class="lede">
+              Movement, density, mix and phasing resolved into a framework that works economically,
+              builds in sequence, and feels <span class="em">generous at eye level</span>.
+            </p>
+          </div>
+
+          <!-- ---------- BEAT 3 — For Consultants ---------- -->
+          <div class="beat" data-beat="3">
+            <p class="eyebrow">For Consultants</p>
+            <h1 class="display headline">
+              <span class="line">
+                <span class="word">Built</span>
+                <span class="word">to</span>
+                <span class="word">fit</span>
+                <span class="word">your</span>
+                <span class="word">team.</span>
+              </span>
+              <span class="line">
+                <span class="word">And</span>
+                <span class="word">to</span>
+                <span class="word">raise</span>
+                <span class="word">its</span>
+                <span class="word italic">game.</span>
+              </span>
+            </h1>
+            <p class="lede">
+              We slot in, communicate in your format, and bring the technical depth to deliver
+              <span class="em">in scope, in budget</span>, and to the standard your project demands.
+            </p>
+          </div>
+
+          <!-- ---------- BEAT 4 — Call to Action ---------- -->
+          <div class="beat" data-beat="4">
+            <p class="eyebrow">Start a Conversation</p>
+            <h1 class="display headline">
+              <span class="line">
+                <span class="word">Let’s</span>
+                <span class="word">build</span>
+                <span class="word">something</span>
+              </span>
+              <span class="line">
+                <span class="word">worth</span>
+                <span class="word italic">remembering.</span>
+              </span>
+            </h1>
+            <p class="lede">
+              Tell us about your site, your brief, or the question you’re trying to answer.
+              We reply <span class="em">within two working days</span>.
+            </p>
+            <a href="mailto:enquiry@mgdeco.ae" class="beat-cta">
+              enquiry@mgdeco.ae <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+
+        </div>
+        <!-- ============ /HERO BEATS ============ -->
+
       </div>
     </div>
 
@@ -3362,10 +3573,8 @@
         </div>
       </div>
 
-      <!-- ---------- CARD 4 — SAMPLES OF WORK (FULLSCREEN BACKGROUND SLIDESHOW) ---------- -->
       <div class="idv__content" data-stack="4" id="idv-samples">
 
-        <!-- ============ INTERIOR SAMPLES — FULLSCREEN BACKGROUND SLIDESHOW ============ -->
         <div class="fullscreen-interior" id="fullscreenInterior">
           <div class="fullscreen-interior__bg-stack" id="fiBgStack"></div>
           <div class="fullscreen-interior__grid" id="fiGrid" aria-hidden="true"></div>
@@ -3719,7 +3928,6 @@
         </div>
       </div>
 
-      <!-- ---------- Card 1 — Overview (article) ---------- -->
       <div class="idv__content" data-stack="1" id="urban-overview">
         <div class="wrap magazine">
 
@@ -3769,7 +3977,6 @@
         </div>
       </div>
 
-      <!-- ---------- Card 2 — What we deliver (viewport height) ---------- -->
       <div class="idv__content idv__content--viewport" data-stack="2" id="urban-deliver">
         <div class="wrap magazine">
 
@@ -3831,7 +4038,6 @@
         </div>
       </div>
 
-      <!-- ---------- Card 3 — Our process (viewport height, step images) ---------- -->
       <div class="idv__content idv__content--viewport" data-stack="3" id="urban-process">
         <div class="wrap magazine">
 
@@ -3875,7 +4081,6 @@
         </div>
       </div>
 
-      <!-- ---------- Card 4 — Samples of work (last, no pin) ---------- -->
       <div class="idv__content" data-stack="4" id="urban-samples">
         <div class="wrap magazine">
 
@@ -4043,8 +4248,6 @@
 
   /* =========================================================
      0. LOADING SCREEN — LOGO ONLY
-        Hides the loader once the page has loaded (or after a
-        short timeout / user interaction, whichever comes first).
      ========================================================= */
   (function initLoadingScreen() {
     const loadingLogo = document.getElementById('loadingLogo');
@@ -4066,7 +4269,6 @@
       };
       loadingLogo.addEventListener('transitionend', onEnd);
 
-      /* Safety: force display none after 1.2s no matter what. */
       setTimeout(() => {
         if (loadingLogo.parentNode) {
           loadingLogo.style.display = 'none';
@@ -4074,17 +4276,14 @@
       }, 1200);
     }
 
-    /* Hide when the page has fully loaded. */
     if (document.readyState === 'complete') {
       requestAnimationFrame(hideLoader);
     } else {
       window.addEventListener('load', () => requestAnimationFrame(hideLoader));
     }
 
-    /* Fallback: hide after 2.5s even if load hasn't fired. */
     const fallbackTimer = setTimeout(hideLoader, 2500);
 
-    /* Hide immediately on any user interaction. */
     ['pointerdown', 'keydown', 'touchstart'].forEach((evt) => {
       window.addEventListener(evt, function onInteract() {
         clearTimeout(fallbackTimer);
@@ -4093,7 +4292,6 @@
       }, { once: true, passive: true });
     });
 
-    /* Expose manual hide. */
     window.__hideLoadingLogo = hideLoader;
   })();
 
@@ -4311,6 +4509,118 @@
   }
 
   startHero();
+
+  /* =========================================================
+     3b. HERO BEATS — FOUR-BEAT ROTATOR + CTA
+     ========================================================= */
+  function initHeroBeats() {
+    const beats = Array.from(document.querySelectorAll('.hero-beats .beat'));
+    if (!beats.length) return;
+
+    const parts = beats.map((beat) => ({
+      eyebrow: beat.querySelector('.eyebrow'),
+      words: Array.from(beat.querySelectorAll('.display .word')),
+      lede: beat.querySelector('.lede'),
+      cta: beat.querySelector('.beat-cta')   // null on beats 0–3
+    }));
+
+    /* --- Reduced motion: stack all beats statically --- */
+    if (reduceMotion) {
+      beats.forEach((beat) => beat.classList.add('active'));
+      return;
+    }
+
+    /* --- GSAP not available: fall back to beat 0 only --- */
+    if (!window.gsap) {
+      beats.forEach((beat, i) => beat.classList.toggle('active', i === 0));
+      return;
+    }
+
+    const { gsap } = window;
+
+    /* --- Initial hidden state for every beat --- */
+    parts.forEach(({ eyebrow, words, lede, cta }) => {
+      gsap.set(eyebrow, { opacity: 0, y: 12, filter: 'blur(0px)' });
+      gsap.set(words,   { yPercent: 110, y: 0, opacity: 0, filter: 'blur(6px)' });
+      gsap.set(lede,    { opacity: 0, y: 20, filter: 'blur(4px)' });
+      if (cta) gsap.set(cta, { opacity: 0, y: 20, filter: 'blur(4px)' });
+    });
+
+    const master = gsap.timeline({ repeat: -1, defaults: { ease: 'power3.out' } });
+
+    beats.forEach((beat, i) => {
+      const { eyebrow, words, lede, cta } = parts[i];
+
+      /* 1 — activate this beat */
+      master.call(() => {
+        beats.forEach((b, j) => b.classList.toggle('active', j === i));
+      });
+
+      /* 2 — eyebrow fades in */
+      master.to(eyebrow, {
+        opacity: 1, y: 0, duration: 0.8, ease: 'power2.out'
+      });
+
+      /* 3 — headline words rise */
+      master.to(words, {
+        yPercent: 0,
+        y: 0,
+        opacity: 1,
+        filter: 'blur(0px)',
+        duration: 0.9,
+        stagger: 0.09,
+        ease: 'power3.out'
+      }, '-=0.35');
+
+      /* 4 — hold on the headline */
+      master.to({}, { duration: 2.0 });
+
+      /* 5 — support paragraph fades in */
+      master.to(lede, {
+        opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out'
+      });
+
+      /* 5b — CTA link (beat 4 only) follows the paragraph */
+      if (cta) {
+        master.to(cta, {
+          opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, ease: 'power2.out'
+        }, '-=0.7');
+      }
+
+      /* 6 — hold on the full beat */
+      master.to({}, { duration: 3.4 });
+
+      /* 7 — fade the whole beat out */
+      const fadeOutTargets = cta
+        ? [eyebrow, ...words, lede, cta]
+        : [eyebrow, ...words, lede];
+
+      master.to(fadeOutTargets, {
+        opacity: 0,
+        y: -20,
+        filter: 'blur(6px)',
+        duration: 0.6,
+        ease: 'power2.in',
+        stagger: 0.02
+      });
+
+      /* 8 — reset the beat back to hidden */
+      master.call(() => {
+        gsap.set(eyebrow, { opacity: 0, y: 12, filter: 'blur(0px)' });
+        gsap.set(words,   { yPercent: 110, y: 0, opacity: 0, filter: 'blur(6px)' });
+        gsap.set(lede,    { opacity: 0, y: 20, filter: 'blur(4px)' });
+        if (cta) gsap.set(cta, { opacity: 0, y: 20, filter: 'blur(4px)' });
+      });
+    });
+
+    /* --- Pause when the tab is hidden --- */
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) master.pause();
+      else master.resume();
+    });
+  }
+
+  initHeroBeats();
 
   /* =========================================================
      4. SCROLL PROGRESS + HEADER STATE + PARALLAX
