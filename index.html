@@ -3575,6 +3575,7 @@
 
       <div class="idv__content" data-stack="4" id="idv-samples">
 
+        <!-- Desktop: fullscreen slideshow -->
         <div class="fullscreen-interior" id="fullscreenInterior">
           <div class="fullscreen-interior__bg-stack" id="fiBgStack"></div>
           <div class="fullscreen-interior__grid" id="fiGrid" aria-hidden="true"></div>
@@ -3605,6 +3606,79 @@
           <div class="fullscreen-interior__dots" id="fiDots" role="tablist" aria-label="Interior image navigation"></div>
           <div class="fullscreen-interior__progress">
             <div class="fullscreen-interior__progress-bar" id="fiProgressBar"></div>
+          </div>
+        </div>
+
+        <!-- Mobile: card grid (like Architecture samples) -->
+        <div class="wrap magazine" id="interiorMobileSamples" style="display:none;">
+          <div class="magazine__section-head reveal">
+            <div>
+              <p class="eyebrow">Samples of work</p>
+              <h2 class="magazine__section-title">Recent interior work</h2>
+            </div>
+            <span class="eyebrow">Placeholder imagery</span>
+          </div>
+
+          <div class="magazine__samples-grid reveal">
+            <article class="card card--lead">
+              <div class="card__img-wrap">
+                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Joud Coffee</h3>
+                <span>Interiors · 2023</span>
+              </div>
+            </article>
+
+            <article class="card card--side">
+              <div class="card__img-wrap">
+                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Joud Coffee</h3>
+                <span>Interiors · 2023</span>
+              </div>
+            </article>
+
+            <article class="card card--half">
+              <div class="card__img-wrap">
+                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Joud Coffee</h3>
+                <span>Interiors · 2023</span>
+              </div>
+            </article>
+
+            <article class="card card--half">
+              <div class="card__img-wrap">
+                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Joud Coffee</h3>
+                <span>Interiors · 2023</span>
+              </div>
+            </article>
+
+            <article class="card card--half">
+              <div class="card__img-wrap">
+                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Joud Coffee</h3>
+                <span>Interiors · 2023</span>
+              </div>
+            </article>
+
+            <article class="card card--half">
+              <div class="card__img-wrap">
+                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
+              </div>
+              <div class="card__meta">
+                <h3>Joud Coffee</h3>
+                <span>Interiors · 2023</span>
+              </div>
+            </article>
           </div>
         </div>
 
@@ -5740,6 +5814,34 @@
         }
       });
     }
+  })();
+
+  /* =========================================================
+     12. MOBILE INTERIOR SAMPLES — SWITCH LAYOUT
+     ========================================================= */
+  (function initMobileInteriorSamples() {
+    const fullscreenInterior = document.getElementById('fullscreenInterior');
+    const mobileSamples = document.getElementById('interiorMobileSamples');
+
+    if (!fullscreenInterior || !mobileSamples) return;
+
+    function updateLayout() {
+      const isMobile = window.innerWidth <= 760;
+      if (isMobile) {
+        fullscreenInterior.style.display = 'none';
+        mobileSamples.style.display = 'block';
+      } else {
+        fullscreenInterior.style.display = '';
+        mobileSamples.style.display = 'none';
+      }
+    }
+
+    updateLayout();
+    window.addEventListener('resize', updateLayout, { passive: true });
+
+    // Re-observe reveal elements when layout changes
+    const mobileReveals = mobileSamples.querySelectorAll('.reveal');
+    mobileReveals.forEach((el) => io.observe(el));
   })();
 
 })();
