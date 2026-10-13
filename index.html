@@ -2941,6 +2941,161 @@
       filter: none !important;
     }
   }
+
+  /* =========================================================
+     INTERIOR SET INDEX + GALLERIES (MOBILE ONLY)
+     ========================================================= */
+  #interiorSetIndex,
+  #interiorSetGalleries {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    #interiorSetIndex {
+      display: block;
+    }
+    #interiorSetGalleries {
+      display: block;
+    }
+
+    #interiorSetGalleries.is-index-open .interior-set-gallery {
+      display: none;
+    }
+
+    #interiorSetGalleries.is-gallery-open #interiorSetIndex {
+      display: none;
+    }
+  }
+
+  .interior-set-index-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  .interior-set-card {
+    display: block;
+    width: 100%;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .interior-set-card:hover,
+  .interior-set-card:focus-visible {
+    outline: none;
+    transform: translateY(-2px);
+  }
+
+  .interior-set-card__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #e6e1d8;
+  }
+
+  .interior-set-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.4s var(--ease-out);
+    will-change: transform;
+  }
+
+  .interior-set-card:hover .interior-set-card__media img,
+  .interior-set-card:focus-visible .interior-set-card__media img {
+    transform: scale(1.04);
+  }
+
+  .interior-set-card__meta {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 1rem 1.1rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.78), transparent 90%);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    z-index: 3;
+  }
+
+  .interior-set-card__title {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    line-height: 1.2;
+  }
+
+  .interior-set-card__sub {
+    font-size: 0.72rem;
+    opacity: 0.85;
+    letter-spacing: 0.02em;
+  }
+
+  .interior-set-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.25rem;
+  }
+
+  .interior-set-card__cta .arrow {
+    display: inline-block;
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .interior-set-card:hover .interior-set-card__cta .arrow,
+  .interior-set-card:focus-visible .interior-set-card__cta .arrow {
+    transform: translateX(4px);
+  }
+
+  .interior-set-gallery {
+    display: none;
+  }
+
+  .interior-set-gallery.is-open {
+    display: block;
+  }
+
+  .interior-set-gallery__head {
+    margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  .interior-set-gallery__back {
+    margin-bottom: 1rem;
+  }
+
+  .interior-set-gallery__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(0.85rem, 3vw, 1.25rem);
+  }
+
+  .interior-set-gallery__grid img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: #e6e1d8;
+  }
 </style>
 </head>
 <body>
@@ -3575,7 +3730,7 @@
 
       <div class="idv__content" data-stack="4" id="idv-samples">
 
-        <!-- Desktop: fullscreen slideshow -->
+        <!-- Desktop: fullscreen slideshow (only 2 images per project) -->
         <div class="fullscreen-interior" id="fullscreenInterior">
           <div class="fullscreen-interior__bg-stack" id="fiBgStack"></div>
           <div class="fullscreen-interior__grid" id="fiGrid" aria-hidden="true"></div>
@@ -3609,76 +3764,80 @@
           </div>
         </div>
 
-        <!-- Mobile: card grid (like Architecture samples) -->
-        <div class="wrap magazine" id="interiorMobileSamples" style="display:none;">
-          <div class="magazine__section-head reveal">
-            <div>
-              <p class="eyebrow">Samples of work</p>
-              <h2 class="magazine__section-title">Recent interior work</h2>
+        <!-- Mobile: set index + per-set galleries -->
+        <div id="interiorSetGalleries" class="is-index-open">
+          <div class="wrap magazine" id="interiorSetIndex">
+            <div class="magazine__section-head reveal">
+              <div>
+                <p class="eyebrow">Samples of work</p>
+                <h2 class="magazine__section-title">Recent interior work</h2>
+              </div>
+              <span class="eyebrow">2 sets</span>
             </div>
-            <span class="eyebrow">Placeholder imagery</span>
+
+            <div class="interior-set-index-grid reveal">
+              <button class="interior-set-card" type="button" data-set="joud" aria-label="Open Joud Coffee gallery">
+                <div class="interior-set-card__media">
+                  <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp" alt="Joud Coffee — cover" loading="lazy" />
+                  <div class="interior-set-card__meta">
+                    <span class="interior-set-card__title">Joud Coffee</span>
+                    <span class="interior-set-card__sub">2023 · 6</span>
+                  </div>
+                </div>
+                <span class="interior-set-card__cta">View set <span class="arrow" aria-hidden="true">→</span></span>
+              </button>
+
+              <button class="interior-set-card" type="button" data-set="alsaif" aria-label="Open Al Saif Tower gallery">
+                <div class="interior-set-card__media">
+                  <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA1.webp" alt="Al Saif Tower — cover" loading="lazy" />
+                  <div class="interior-set-card__meta">
+                    <span class="interior-set-card__title">Al Saif Tower</span>
+                    <span class="interior-set-card__sub">2024 · 8</span>
+                  </div>
+                </div>
+                <span class="interior-set-card__cta">View set <span class="arrow" aria-hidden="true">→</span></span>
+              </button>
+            </div>
           </div>
 
-          <div class="magazine__samples-grid reveal">
-            <article class="card card--lead">
-              <div class="card__img-wrap">
-                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Joud Coffee</h3>
-                <span>Interiors · 2023</span>
-              </div>
-            </article>
+          <div class="wrap magazine interior-set-gallery" data-gallery="joud">
+            <div class="interior-set-gallery__head">
+              <button class="back-btn interior-set-gallery__back" type="button" data-gallery-back>
+                <span class="arrow">←</span> All sets
+              </button>
+              <p class="eyebrow">Sample work</p>
+              <h2 class="magazine__section-title">Joud Coffee</h2>
+              <span class="eyebrow">Interiors · 2023 · 6 images</span>
+            </div>
+            <div class="interior-set-gallery__grid">
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp" alt="Joud Coffee — 1" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp" alt="Joud Coffee — 2" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp" alt="Joud Coffee — 3" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp" alt="Joud Coffee — 4" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp" alt="Joud Coffee — 5" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp" alt="Joud Coffee — 6" loading="lazy" />
+            </div>
+          </div>
 
-            <article class="card card--side">
-              <div class="card__img-wrap">
-                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Joud Coffee</h3>
-                <span>Interiors · 2023</span>
-              </div>
-            </article>
-
-            <article class="card card--half">
-              <div class="card__img-wrap">
-                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Joud Coffee</h3>
-                <span>Interiors · 2023</span>
-              </div>
-            </article>
-
-            <article class="card card--half">
-              <div class="card__img-wrap">
-                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Joud Coffee</h3>
-                <span>Interiors · 2023</span>
-              </div>
-            </article>
-
-            <article class="card card--half">
-              <div class="card__img-wrap">
-                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Joud Coffee</h3>
-                <span>Interiors · 2023</span>
-              </div>
-            </article>
-
-            <article class="card card--half">
-              <div class="card__img-wrap">
-                <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp" alt="Joud Coffee — interior project" loading="lazy" />
-              </div>
-              <div class="card__meta">
-                <h3>Joud Coffee</h3>
-                <span>Interiors · 2023</span>
-              </div>
-            </article>
+          <div class="wrap magazine interior-set-gallery" data-gallery="alsaif">
+            <div class="interior-set-gallery__head">
+              <button class="back-btn interior-set-gallery__back" type="button" data-gallery-back>
+                <span class="arrow">←</span> All sets
+              </button>
+              <p class="eyebrow">Sample work</p>
+              <h2 class="magazine__section-title">Al Saif Tower</h2>
+              <span class="eyebrow">Interiors · 2024 · 8 images</span>
+            </div>
+            <div class="interior-set-gallery__grid">
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA1.webp" alt="Al Saif Tower — 1" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA2.webp" alt="Al Saif Tower — 2" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA3.webp" alt="Al Saif Tower — 3" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA4.webp" alt="Al Saif Tower — 4" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA5.webp" alt="Al Saif Tower — 5" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA6.webp" alt="Al Saif Tower — 6" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA7.webp" alt="Al Saif Tower — 7" loading="lazy" />
+              <img src="https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA8.webp" alt="Al Saif Tower — 8" loading="lazy" />
+            </div>
           </div>
         </div>
 
@@ -4319,6 +4478,42 @@
 (() => {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const supportsVT = 'startViewTransition' in document;
+
+  /* =========================================================
+     SHARED INTERIOR SET DATA (single source of truth)
+     ========================================================= */
+  const INTERIOR_SETS = [
+    {
+      id: 'joud',
+      title: 'Joud Coffee',
+      category: 'Interiors',
+      year: '2023',
+      images: [
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp'
+      ]
+    },
+    {
+      id: 'alsaif',
+      title: 'Al Saif Tower',
+      category: 'Interiors',
+      year: '2024',
+      images: [
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA1.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA2.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA3.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA4.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA5.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA6.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA7.webp',
+        'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA8.webp'
+      ]
+    }
+  ];
 
   /* =========================================================
      0. LOADING SCREEN — LOGO ONLY
@@ -5122,14 +5317,7 @@
   /* =========================================================
      9. COVER FLOW CAROUSEL — INTERIOR DESIGN SAMPLES
      ========================================================= */
-  const carouselSources = [
-    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp',
-    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp',
-    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp',
-    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp',
-    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp',
-    'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp'
-  ];
+  const carouselSources = INTERIOR_SETS[0].images.slice();
 
   function preloadCarouselImages() {
     carouselSources.slice(0, 2).forEach((src, i) => {
@@ -5551,6 +5739,7 @@
 
   /* =========================================================
      11. FULLSCREEN INTERIOR BACKGROUND SLIDESHOW
+     (Now reads from INTERIOR_SETS and shows only 2 images per project)
      ========================================================= */
   (function initFullscreenInterior() {
     const container = document.getElementById('fullscreenInterior');
@@ -5581,48 +5770,15 @@
     deferredObserver.observe(container);
 
     function start() {
-      const interiorProjects = [
-        {
-          title: 'Joud Coffee',
-          category: 'Interiors',
-          year: '2023',
-          images: [
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_002_20.11.23.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_007_20.11.23.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_008_20.11.23.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_010_20.11.23.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_016_20.11.23.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Joud cafe webp/JoudCaffee_BeARTpro_026_20.11.23.webp'
-          ]
-        },
-        {
-          title: 'Al Saif Tower',
-          category: 'Interiors',
-          year: '2024',
-          images: [
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA1.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA2.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA3.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA4.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA5.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA6.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA7.webp',
-            'https://cdn.jsdelivr.net/gh/mgdecoae/mgdeco-ae@main/images/Al Saif Tower/SA8.webp'
-          ]
-        }
-      ];
-
-      const projects = [];
-      interiorProjects.forEach((proj) => {
-        proj.images.forEach((src) => {
-          projects.push({
-            title: proj.title,
-            category: proj.category,
-            year: proj.year,
-            src
-          });
-        });
-      });
+      const IMAGES_PER_SET = 2;
+      const projects = INTERIOR_SETS.flatMap((set) =>
+        set.images.slice(0, IMAGES_PER_SET).map((src) => ({
+          title: set.title,
+          category: set.category,
+          year: set.year,
+          src
+        }))
+      );
 
       let currentIndex = 0;
       let slideElements = [];
@@ -5817,31 +5973,95 @@
   })();
 
   /* =========================================================
-     12. MOBILE INTERIOR SAMPLES — SWITCH LAYOUT
+     12. INTERIOR SET GALLERIES (MOBILE)
      ========================================================= */
-  (function initMobileInteriorSamples() {
-    const fullscreenInterior = document.getElementById('fullscreenInterior');
-    const mobileSamples = document.getElementById('interiorMobileSamples');
+  (function initInteriorSetGalleries() {
+    const container = document.getElementById('interiorSetGalleries');
+    const indexEl   = document.getElementById('interiorSetIndex');
+    if (!container || !indexEl) return;
 
-    if (!fullscreenInterior || !mobileSamples) return;
+    const validSets = new Set(INTERIOR_SETS.map((s) => s.id));
 
-    function updateLayout() {
-      const isMobile = window.innerWidth <= 760;
-      if (isMobile) {
-        fullscreenInterior.style.display = 'none';
-        mobileSamples.style.display = 'block';
+    function hashToSetId() {
+      const h = (window.location.hash || '').replace(/^#/, '');
+      const m = h.match(/^gallery-([a-z0-9-]+)$/i);
+      if (!m) return null;
+      const id = m[1];
+      return validSets.has(id) ? id : null;
+    }
+
+    function setState(openSetId, opts = {}) {
+      const galleries = container.querySelectorAll('.interior-set-gallery');
+      galleries.forEach((g) => {
+        g.classList.toggle('is-open', g.dataset.gallery === openSetId);
+      });
+
+      if (openSetId) {
+        container.classList.add('is-gallery-open');
+        container.classList.remove('is-index-open');
       } else {
-        fullscreenInterior.style.display = '';
-        mobileSamples.style.display = 'none';
+        container.classList.add('is-index-open');
+        container.classList.remove('is-gallery-open');
+      }
+
+      // Sync hash without triggering our own hashchange handler twice
+      if (opts.updateHash) {
+        const nextHash = openSetId ? `#gallery-${openSetId}` : '';
+        const url = window.location.pathname + window.location.search + nextHash;
+        if (openSetId) {
+          history.pushState({ interiorGallery: openSetId }, '', url);
+        } else {
+          history.pushState({ interiorGallery: null }, '', url);
+        }
+      }
+
+      if (opts.scrollToTop) {
+        const target = container;
+        if (target) {
+          // Scroll just the samples block into view without yanking the whole page
+          const rect = target.getBoundingClientRect();
+          const absoluteTop = window.scrollY + rect.top - (window.innerHeight * 0.08);
+          window.scrollTo({ top: Math.max(0, absoluteTop), behavior: reduceMotion ? 'auto' : 'smooth' });
+        }
       }
     }
 
-    updateLayout();
-    window.addEventListener('resize', updateLayout, { passive: true });
+    // Click: open set
+    container.addEventListener('click', (e) => {
+      const openBtn = e.target.closest('.interior-set-card[data-set]');
+      if (openBtn && container.contains(openBtn)) {
+        const id = openBtn.dataset.set;
+        if (!validSets.has(id)) return;
+        setState(id, { updateHash: true, scrollToTop: true });
+        return;
+      }
 
-    // Re-observe reveal elements when layout changes
-    const mobileReveals = mobileSamples.querySelectorAll('.reveal');
-    mobileReveals.forEach((el) => io.observe(el));
+      const backBtn = e.target.closest('[data-gallery-back]');
+      if (backBtn && container.contains(backBtn)) {
+        setState(null, { updateHash: true, scrollToTop: true });
+        return;
+      }
+    });
+
+    // Browser back / forward
+    window.addEventListener('popstate', () => {
+      const id = hashToSetId();
+      setState(id, { updateHash: false, scrollToTop: false });
+    });
+
+    // External hash changes (e.g. typing a #gallery-... URL)
+    window.addEventListener('hashchange', () => {
+      const id = hashToSetId();
+      setState(id, { updateHash: false, scrollToTop: false });
+    });
+
+    // Auto-open if page loaded with a gallery hash
+    const initial = hashToSetId();
+    if (initial) {
+      setState(initial, { updateHash: false, scrollToTop: false });
+    } else {
+      setState(null, { updateHash: false, scrollToTop: false });
+    }
   })();
 
 })();
